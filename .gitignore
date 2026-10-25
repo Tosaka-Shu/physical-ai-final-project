@@ -1,0 +1,40 @@
+# Secret/config values
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# ROS / simulation build artifacts
+build/
+install/
+log/
+*.bag
+*.db3
+*.mcap
+
+# Generated media and large datasets
+*.mp4
+*.avi
+*.mov
+*.zip
+*.tar.gz
+outputs/
+runs/
+checkpoints/
+models/
+datasets/
+
+# System
+.DS_Store
+Thumbs.db
