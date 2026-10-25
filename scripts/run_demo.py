@@ -13,7 +13,7 @@ from rescue_delivery.provenance import environment_info
 if __name__=='__main__':
     p=argparse.ArgumentParser(); p.add_argument('--model',default='models/risk-v2.joblib')
     p.add_argument('--seed',type=int,default=200); p.add_argument('--seconds',type=float,default=12)
-    p.add_argument('--fps',type=int,default=10); p.add_argument('--output',default='outputs/v2/preview.mp4')
+    p.add_argument('--fps',type=int,default=10); p.add_argument('--output',default='outputs/v2-final/preview.mp4')
     p.add_argument('--method',choices=['risk','distance'],default='risk')
     p.add_argument('--scenario',choices=['basic','shortcut','dynamic'],default='dynamic')
     p.add_argument('--difficulty',choices=['easy','normal','hard'],default='normal')

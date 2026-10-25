@@ -14,12 +14,23 @@ from .safety import filter_action
 DEFAULT_CONFIG=Path(__file__).resolve().parents[2]/'configs/default.json'
 
 
-def config(path=None):
-    values=json.loads(Path(path or DEFAULT_CONFIG).read_text())
-    if any(not np.isfinite(v) or v<=0 for k,v in values.items() if k!='risk_weight'):
-        raise ValueError('configuration values must be finite and positive')
-    if not np.isfinite(values['risk_weight']) or values['risk_weight']<0: raise ValueError('invalid risk weight')
-    if int(values['sensor_rays'])!=values['sensor_rays'] or values['sensor_rays']<4: raise ValueError('sensor rays')
+def config(path=None, overrides=None):
+    values=json.loads(DEFAULT_CONFIG.read_text())
+    updates=json.loads(Path(path).read_text()) if path is not None else {}
+    if not isinstance(updates,dict) or (overrides is not None and not isinstance(overrides,dict)):
+        raise ValueError('configuration overrides must be an object')
+    updates.update(overrides or {})
+    unknown=set(updates)-set(values)
+    if unknown: raise ValueError(f'unknown configuration keys: {sorted(unknown)}')
+    values.update(updates)
+    for key,value in values.items():
+        if isinstance(value,bool) or not isinstance(value,(int,float)) or not np.isfinite(value):
+            raise ValueError(f'{key} must be a finite number')
+        if value<0 or (key!='risk_weight' and value==0):
+            raise ValueError(f'{key} must be positive (risk_weight may be zero)')
+    for key in ('sensor_rays','max_steps'):
+        if int(values[key])!=values[key]: raise ValueError(f'{key} must be an integer')
+    if values['sensor_rays']<4: raise ValueError('sensor_rays must be at least 4')
     return values
 
 
@@ -52,9 +63,10 @@ class Result:
 
 def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
         difficulty='normal', method=None, settings=None, world=None):
-    cfg=config(); cfg.update(settings or {})
+    cfg=config(overrides=settings)
     if max_steps is None: max_steps=int(cfg['max_steps'])
-    if max_steps<1: raise ValueError('max_steps must be positive')
+    if isinstance(max_steps,bool) or not isinstance(max_steps,int) or max_steps<1:
+        raise ValueError('max_steps must be a positive integer')
     if method is None: method='risk' if model is not None else 'distance'
     if method not in ('distance','risk'): raise ValueError('unknown method')
     wallclock=perf_counter(); world=world or World(seed,scenario,difficulty)

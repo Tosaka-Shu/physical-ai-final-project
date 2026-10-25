@@ -22,7 +22,7 @@ python scripts/evaluate.py --seeds 200 201 202 --output outputs/evaluation-v2-fi
 python scripts/run_demo.py --compare --output outputs/v2-final/preview.mp4
 ```
 
-毎回、作業ディレクトリと仮想環境・PYTHONPATHを設定する。requirements.txtは主要依存、requirements-lock.txtは今回の全推移依存を固定。設定は[configs/default.json](configs/default.json)にまとめ、`--config`で別JSONを指定できる。新しい依存を増やさないためYAMLではなくJSONを使用した。
+毎回、作業ディレクトリと仮想環境・PYTHONPATHを設定する。requirements.txtは主要依存、requirements-lock.txtは今回の全推移依存を固定。設定は[configs/default.json](configs/default.json)にまとめ、`--config`で部分上書き用JSONを指定できる。未指定キーは既定値を維持し、不正値・未知キーは実行前に拒否する。新しい依存を増やさないためYAMLではなくJSONを使用した。
 
 ## 実装とAI
 
@@ -76,3 +76,5 @@ python scripts/run_demo.py --method distance --scenario basic \
 初期地図と自己位置は既知、検出は理想的な物体分類・中心推定を仮定する。学習地図は変化させるが、配送評価の主要壁構造は限定的。RF危険度は未校正で、実機安全性を保証しない。停止中のロボットへ物体が侵入するケースもあり、観測速度による早期迂回で軽減する。実機ブレーキ、SLAM、ノイズ・遅延、車輪の滑り、荷物の物理、ROS 2連携は未実装。
 
 コードは作業ブランチとPRで提供し、mainへのマージ、YouTube公開、PDF化・提出、OmniCampusへのURL提出は自動実行しない。提出用識別子や個人情報は公開コードに含めず、提出時に手元で設定する。締切2026-11-02 10:00 JST。提出前に[要件チェック](docs/requirements.md)を確認する。
+
+PR #1とPR #2の置換・維持・整理の対応は[統合確認](docs/integration_review.md)を参照。

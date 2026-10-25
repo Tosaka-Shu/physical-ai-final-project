@@ -42,7 +42,7 @@ if __name__=='__main__':
     p.add_argument('--seeds',type=int,nargs='+',default=[200,201,202])
     p.add_argument('--scenarios',nargs='+',choices=['basic','shortcut','dynamic'],default=['basic','shortcut','dynamic'])
     p.add_argument('--difficulty',choices=['easy','normal','hard'],default='normal')
-    p.add_argument('--config',default=None); p.add_argument('--output',default='outputs/evaluation-v2')
+    p.add_argument('--config',default=None); p.add_argument('--output',default='outputs/evaluation-v2-final')
     a=p.parse_args(); model=load(a.model); rows=[]
     out=Path(a.output); out.mkdir(parents=True,exist_ok=True)
     settings=config(a.config)

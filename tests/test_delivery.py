@@ -1,5 +1,4 @@
 import copy
-import json
 import math
 import numpy as np
 import pytest
@@ -220,3 +219,22 @@ def test_ai_fixed_seed_reproducibility(model):
     b=run(201,model,max_steps=20)
     assert a.initial_path==b.initial_path
     assert [r['next_pose'] for r in a.logs]==[r['next_pose'] for r in b.logs]
+
+
+def test_partial_config_preserves_defaults(tmp_path):
+    from rescue_delivery.simulation import config
+    path=tmp_path/'config.json'
+    path.write_text('{"risk_weight": 0, "max_speed": 0.5}')
+    cfg=config(path)
+    assert cfg['risk_weight']==0 and cfg['max_speed']==.5 and cfg['dt']==.1
+    assert run(200,settings={'max_steps':1,'max_speed':.5}).outcome=='timeout'
+
+
+@pytest.mark.parametrize('override',[
+    {'dt':0}, {'risk_weight':-1}, {'max_speed':float('nan')},
+    {'max_steps':1.5}, {'sensor_rays':3}, {'unknown_option':1}, {'dt':True}, [],
+])
+def test_invalid_config_rejected_before_simulation(override):
+    from rescue_delivery.simulation import config
+    with pytest.raises(ValueError): config(overrides=override)
+    with pytest.raises(ValueError): run(settings=override)
