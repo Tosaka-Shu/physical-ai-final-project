@@ -1,0 +1,29 @@
+{
+  "preview": {
+    "path": "outputs/preview.mp4",
+    "duration_seconds": 12.0,
+    "width": 1280,
+    "height": 720,
+    "codec": "h264"
+  },
+  "demo": {
+    "path": "outputs/demo90.mp4",
+    "duration_seconds": 90.0,
+    "width": 1280,
+    "height": 720,
+    "codec": "h264",
+    "frames": 1080,
+    "full_decode": "passed"
+  },
+  "simulation_seed": 200,
+  "simulation_seconds": 52.4,
+  "method": "risk",
+  "initial_path_changed_by_ai": true,
+  "baseline_path_cells": 21,
+  "risk_path_cells": 35,
+  "delivery_success": true,
+  "collisions": 0,
+  "near_misses": 0,
+  "note": "Video positions are resampled from recorded simulation; playback factor is displayed. Generated media and trace JSON are ignored by Git.",
+  "version": 1
+}

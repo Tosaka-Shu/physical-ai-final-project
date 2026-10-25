@@ -1,14 +1,52 @@
 {
-  "preview": {"path": "outputs/preview.mp4", "duration_seconds": 12.0, "width": 1280, "height": 720, "codec": "h264"},
-  "demo": {"path": "outputs/demo90.mp4", "duration_seconds": 90.0, "width": 1280, "height": 720, "codec": "h264", "frames": 1080, "full_decode": "passed"},
-  "simulation_seed": 200,
-  "simulation_seconds": 52.4,
-  "method": "risk",
+  "version": 2,
+  "preview": {
+    "path": "outputs/v2-final/preview.mp4",
+    "duration_seconds": 12.0,
+    "width": 1280,
+    "height": 720,
+    "codec": "h264",
+    "frames": 120,
+    "full_decode": "passed",
+    "excerpt_maximum_playback": 2.0,
+    "submission_video": false
+  },
+  "demo": {
+    "path": "outputs/v2-final/demo90.mp4",
+    "duration_seconds": 90.0,
+    "width": 1280,
+    "height": 720,
+    "codec": "h264",
+    "frames": 720,
+    "fps": 8,
+    "full_decode": "passed",
+    "submission_video": true
+  },
+  "source_logs": [
+    "outputs/v2-final/preview.jsonl",
+    "outputs/v2-final/preview-baseline.jsonl"
+  ],
+  "comparison": "same scenario dynamic, seed 200, difficulty normal",
+  "risk_run": {
+    "seed": 200,
+    "method": "risk",
+    "scenario": "dynamic",
+    "difficulty": "normal",
+    "success": true,
+    "outcome": "success",
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 34.648541956840766,
+    "replans": 6,
+    "stops": 0,
+    "elapsed": 57.400000000000006,
+    "min_clearance": 0.29999999975931074,
+    "inference_latency_ms": 7054.730922001909,
+    "inference_calls": 581,
+    "runtime_s": 10.72492132299999
+  },
   "initial_path_changed_by_ai": true,
-  "baseline_path_cells": 21,
-  "risk_path_cells": 35,
-  "delivery_success": true,
-  "collisions": 0,
-  "near_misses": 0,
-  "note": "Video positions are resampled from recorded simulation; playback factor is displayed. Generated media and trace JSON are ignored by Git."
+  "baseline_cells": 21,
+  "risk_cells": 33,
+  "note": "All poses and events are from validated saved logs. 90s video contains full runs, Japanese explanation, simulation label and playback factor. YouTube upload not performed."
 }

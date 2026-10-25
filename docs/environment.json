@@ -1,0 +1,28 @@
+{
+  "python": "3.12.14",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "git_commit": "9f9d52ab1cbb978490c4f99a9e2fbab96aaa316b",
+  "working_tree_dirty": true,
+  "config": {
+    "dt": 0.1,
+    "max_steps": 1800,
+    "max_speed": 0.9,
+    "max_omega": 2.0,
+    "max_acceleration": 1.0,
+    "max_angular_acceleration": 4.0,
+    "risk_weight": 8.0,
+    "sensor_rays": 32,
+    "sensor_range": 5.0,
+    "command_timeout": 0.25,
+    "replan_interval": 2.0
+  },
+  "packages": {
+    "numpy": "2.2.6",
+    "scikit-learn": "1.7.2",
+    "matplotlib": "3.10.7",
+    "pytest": "8.4.2",
+    "joblib": "1.6.0"
+  },
+  "model_sha256": "9dd2649bb13bec0605df27a1b276ace5b1206be45f54e2521014733e2505bb5c",
+  "ffmpeg": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers"
+}

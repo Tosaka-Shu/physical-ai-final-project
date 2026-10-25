@@ -1,0 +1,13 @@
+{
+  "dt": 0.1,
+  "max_steps": 1800,
+  "max_speed": 0.9,
+  "max_omega": 2.0,
+  "max_acceleration": 1.0,
+  "max_angular_acceleration": 4.0,
+  "risk_weight": 8.0,
+  "sensor_rays": 32,
+  "sensor_range": 5.0,
+  "command_timeout": 0.25,
+  "replan_interval": 2.0
+}
