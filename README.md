@@ -31,7 +31,7 @@ python scripts/run_demo.py --seconds 12 --output outputs/preview.mp4
 - `docs/results.md`、`docs/evaluation.json`、`docs/model_metrics.json`：今回の小さな実測記録
 
 通常方式の動画は `python scripts/run_demo.py --method distance --output outputs/distance.mp4`。
-90秒版は `python scripts/run_demo.py --seconds 90 --fps 12 --output outputs/demo90.mp4`。指定した尺へ実走行ログを再サンプリングするため、タイトルに実際の再生倍率を表示する。位置はログから取り出し、架空の走行は追加しない。90秒版の生成状況は作業報告を参照。動画に音声はない。
+90秒版は `python scripts/run_demo.py --seconds 90 --fps 12 --output outputs/demo90.mp4`。指定した尺へ実走行ログを再サンプリングするため、タイトルに実際の再生倍率を表示する。位置はログから取り出し、架空の走行は追加しない。今回、12秒プレビューと90秒版（1280×720、H.264、12fps）を生成し、90秒版は全フレームのデコードを確認済み。動画に音声はない。
 
 ## AI使用部分と再現条件
 
