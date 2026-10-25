@@ -1,10 +1,12 @@
 # AI危険度予測による災害救援物資の自律配送ロボット
 
-CPU・ヘッドレスで実行できるPython製2Dロボットシミュレーション。救援基地から避難所へ、壁・瓦礫・狭路・移動障害物を避けて配送する。通常A*とRandom Forest危険度をコストに加えたA*を比較する。実機やROS/Gazeboのシミュレーションではなく、独自の簡易運動モデルである。
+Risk-Aware Autonomous Rescue Delivery Robot。CPU・ヘッドレスで動く独自のPython製2D差動二輪シミュレーション。通常A*とRandom Forest危険度を加えたA*で、基地から避難所への配送を比較する。ROS 2/Gazebo・実機・外部API・GPUは使っていない。
+
+添付課題資料（10/19改訂版）を提出要件の正本として確認し、今回のv2開発指示との差を[要件対応](docs/requirements.md)へ整理した。PDFや講義の非公開資料はリポジトリへ転載していない。
 
 ## セットアップ
 
-Python 3.12、FFmpeg（libx264対応）、日本語フォントNoto Sans CJKを使用。GPU・有料API・キーは不要。Debian/Ubuntuでシステム依存がない場合は `sudo apt-get install ffmpeg fonts-noto-cjk`。
+Python 3.12を使用。FFmpeg（libx264対応）とNoto Sans CJKが必要。Debian/Ubuntuでシステム依存がない場合は `sudo apt-get install ffmpeg fonts-noto-cjk`。動画機能以外のテストではこれらは不要。
 
 ```bash
 cd /workspace/physical-ai-final-project
@@ -14,35 +16,63 @@ python -m pip install -r requirements-lock.txt
 export PYTHONPATH="$PWD/src"
 export MPLCONFIGDIR=/tmp/rescue-matplotlib
 pytest -q
+python scripts/generate_dataset.py
 python scripts/train_model.py
-python scripts/evaluate.py --seeds 200 201 202
-python scripts/run_demo.py --seconds 12 --output outputs/preview.mp4
+python scripts/evaluate.py --seeds 200 201 202 --output outputs/evaluation-v2-final
+python scripts/run_demo.py --compare --output outputs/v2-final/preview.mp4
 ```
 
-標準シェルでは実行前に毎回仮想環境とPYTHONPATHを設定する。`requirements.txt`は主要依存の固定、`requirements-lock.txt`は今回使用した推移依存を含む固定版。モデルは再学習で生成し、外部の未信頼pickleをロードしない。
+毎回、作業ディレクトリと仮想環境・PYTHONPATHを設定する。requirements.txtは主要依存、requirements-lock.txtは今回の全推移依存を固定。設定は[configs/default.json](configs/default.json)にまとめ、`--config`で別JSONを指定できる。新しい依存を増やさないためYAMLではなくJSONを使用した。
 
-## 実行と成果物
+## 実装とAI
 
-- `models/risk.pkl`：学習済みモデル（Git除外）
-- `models/risk.json`：シナリオ分割・精度・ROC AUC
-- `outputs/evaluation/results.{csv,json,md}`：複数シードでの実測
-- `outputs/preview.mp4`：日本語テロップ付き720pプレビュー
-- `outputs/preview.json`：動画の根拠となる時刻・姿勢・移動物体・経路・結果
-- `docs/results.md`、`docs/evaluation.json`、`docs/model_metrics.json`：今回の小さな実測記録
+- 25×20の壁・瓦礫・狭路、外生的に移動する円障害物、6秒で道路が閉じるイベント。
+- 加速度制限付き差動二輪(x,y,theta,v,omega)、レイキャストLiDAR、過去観測差分の接近速度。
+- 既知の初期静的地図＋実際に観測した障害物だけを計画へ渡す。真値と未来位置は教師ラベル／評価器に隔離する。
+- RFの`predict_proba()`を実際のA*辺コストへ加算する。モデルの有無と重み0による経路変化をテスト。
+- AIと独立した近接・掃引安全ゲート、指令／観測のタイムアウト、モデル異常時の停止。通常方式へ黙って切り替えない。
+- 時刻付きJSONL、品質検査、保存ログからのリプレイ、比較CSV/JSON/Markdown。
 
-通常方式の動画は `python scripts/run_demo.py --method distance --output outputs/distance.mp4`。
-90秒版は `python scripts/run_demo.py --seconds 90 --fps 12 --output outputs/demo90.mp4`。指定した尺へ実走行ログを再サンプリングするため、タイトルに実際の再生倍率を表示する。位置はログから取り出し、架空の走行は追加しない。今回、12秒プレビューと90秒版（1280×720、H.264、12fps）を生成し、90秒版は全フレームのデコードを確認済み。動画に音声はない。
+データは局所直進1.5秒の衝突／ニアミスから生成する。学習24シナリオ0–23、検証6シナリオ40–45、テスト6シナリオ100–105を分離する。各150例。モデル乱数42。検証F1だけでRFの深さを選び、テストをモデル選択へ使わない。精度・適合率・再現率・F1・ROC AUC・混同行列・重要度・推論時間を保存する。joblibはローカル生成の信頼できるファイルだけを読み込む。
 
-## AI使用部分と再現条件
+独自の工夫は、局所走行結果からの教師ラベル、方向ごとのリスクコスト、狭路と広路の選択、観測した接近速度による再計画、独立安全層、ログ整合性検査と実走行再生を一貫させた点。
 
-RandomForestClassifierの`predict_proba()`をA*の各移動コストに加算する。障害物からの距離・通路幅・移動障害物の相対位置と接近速度・進行方向と速度を入力する。ラベルは1.5秒の局所走行を実際に模擬した衝突またはニアミス。学習0–29、評価100–109、配送比較200–202のシナリオを分離し、モデル乱数42で固定する。
+## 比較と動画の再現
 
-独自の工夫は、狭路と広路の選択、方向別危険度のバッチ推論、AIと独立した安全制御、実走行ログに基づく動画。テストでは学習したモデルが通常方式とは異なる経路を選ぶこと、両方式の配送、衝突回避、再計画を検証する。
+basic（静的基本）、shortcut（危険な近道）、dynamic（移動障害物＋道路封鎖）の3種類を、同じシード・初期地図・センサー・物体軌跡・安全設定で比較する。難易度は `--difficulty easy|normal|hard`。全18試行は[実測結果](docs/results.md)と[個別JSON](docs/evaluation.json)。AI方式が常に改善するとは仮定しない。
 
-## 結果と既知の制約
+```bash
+# 保存した観測・姿勢・イベントから90秒の比較動画を再生
+python scripts/make_video.py outputs/v2-final/preview.jsonl \
+  --baseline-log outputs/v2-final/preview-baseline.jsonl \
+  --seconds 90 --fps 10 --output outputs/v2-final/demo90.mp4
 
-[実測結果](docs/results.md)では今回の3シードで両方式とも配送に成功した。AI方式の距離と再計画回数は増加しており、一般的な優位性は確認できていない。
+# 通常方式だけの診断
+python scripts/run_demo.py --method distance --scenario basic \
+  --output outputs/v2-final/distance.mp4
+```
 
-地図の主要壁構造は固定、瓦礫配置と移動位相を乱数化する。経路と安全制御は完全な世界状態を使用し、仮想距離センサーは観測・記録用。移動障害物も接触を避ける譲り合い規則に従う。AIは到着時刻を予測せず、局所危険度は実環境で校正された確率ではない。実機安全性・SLAM・滑り・センサー雑音は対象外。
+12秒プレビューは冒頭抜粋（最大2倍速）で、提出動画ではない。60〜180秒の本番動画は全走行を再生し、最大2倍速を超える尺を拒否する。今回の90秒版は8fps・720フレームで実際に生成し全フレームのデコードと配送成功表示を確認した。90秒版は1280×720・H.264・日本語説明付きで、実際の姿勢・経路ログだけを表示する。「2Dロボットシミュレーション」と再生倍率を明記し、短い配送終了後の保持表示を設ける。ヒートマップは初期観測の東向き・0.9m/s参考値、現在の数値はログの局所推論値。音声はない。
 
-[設計](docs/design.md) / [レポート構成案](docs/report_outline.md) / [課題要件](docs/requirements.md)。1–3分の最終動画のYouTube公開、PDF作成・提出、mainへのマージは別途必要。
+## 生成物と文書
+
+|保存先|内容|
+|---|---|
+|datasets/train.npz|自作学習データのサンプル生成（同じ生成関数を学習でも使用）|
+|models/risk-v2.joblib / risk-v2.json|学習済みモデル／評価とデータハッシュ|
+|outputs/evaluation-v2-final/|全試行CSV・JSON・Markdown、環境記録、各走行JSONL|
+|outputs/v2-final/preview.mp4 / preview.jsonl|新版プレビュー／完全なAI走行ログ|
+|outputs/v2-final/preview-baseline.jsonl|通常方式の比較走行ログ|
+|outputs/v2-final/demo90.mp4|保存ログから生成する90秒比較動画|
+|docs/model_metrics.json|今回のモデル評価の小さな記録|
+|docs/diagnosis/|開発中に見つけた衝突と改善の記録（最終結果とは区別）|
+
+動画・データ・モデル・一時ログはGit除外。旧版のoutputs/preview.mp4、outputs/demo90.mp4、models/risk.pkl等が残っていても、新版の成果物とは区別する。
+
+[設計・構成図](docs/design.md) / [ログ仕様](docs/log_schema.md) / [OSSライセンス](docs/third_party_licenses.md) / [日本語レポート原稿](docs/report_outline.md)。GitHub ActionsのCPUテスト定義を追加したが、リモート実行結果はローカルpytestとは別に確認する。
+
+## 既知の制約と提出状況
+
+初期地図と自己位置は既知、検出は理想的な物体分類・中心推定を仮定する。学習地図は変化させるが、配送評価の主要壁構造は限定的。RF危険度は未校正で、実機安全性を保証しない。停止中のロボットへ物体が侵入するケースもあり、観測速度による早期迂回で軽減する。実機ブレーキ、SLAM、ノイズ・遅延、車輪の滑り、荷物の物理、ROS 2連携は未実装。
+
+コードは作業ブランチとPRで提供し、mainへのマージ、YouTube公開、PDF化・提出、OmniCampusへのURL提出は自動実行しない。提出用識別子や個人情報は公開コードに含めず、提出時に手元で設定する。締切2026-11-02 10:00 JST。提出前に[要件チェック](docs/requirements.md)を確認する。
