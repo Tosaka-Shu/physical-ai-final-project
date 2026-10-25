@@ -54,6 +54,6 @@ if __name__=='__main__':
                 rows.append(result.metrics()); print(json.dumps(rows[-1]),flush=True)
                 (out/'results.json').write_text(json.dumps(rows,indent=2)+'\n')
     with (out/'results.csv').open('w',newline='') as f:
-        w=csv.DictWriter(f,fieldnames=rows[0]); w.writeheader(); w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=rows[0],lineterminator='\n'); w.writeheader(); w.writerows(rows)
     (out/'results.md').write_text(summary_markdown(rows))
     (out/'environment.json').write_text(json.dumps(environment_info(settings,a.model),indent=2)+'\n')
