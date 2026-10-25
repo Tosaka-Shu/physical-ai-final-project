@@ -1,0 +1,74 @@
+[
+  {
+    "seed": 200,
+    "method": "distance",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 31.18687528153337,
+    "replans": 1,
+    "stops": 0,
+    "elapsed": 47.7,
+    "min_clearance": 0.2625299831375571
+  },
+  {
+    "seed": 200,
+    "method": "risk",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 32.775925200435616,
+    "replans": 3,
+    "stops": 2,
+    "elapsed": 52.400000000000006,
+    "min_clearance": 0.21964000541283946
+  },
+  {
+    "seed": 201,
+    "method": "distance",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 31.18687528153337,
+    "replans": 1,
+    "stops": 0,
+    "elapsed": 47.7,
+    "min_clearance": 0.2625299831375571
+  },
+  {
+    "seed": 201,
+    "method": "risk",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 33.37278546880495,
+    "replans": 3,
+    "stops": 0,
+    "elapsed": 53.300000000000004,
+    "min_clearance": 0.3827080862026188
+  },
+  {
+    "seed": 202,
+    "method": "distance",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 31.18687528153337,
+    "replans": 1,
+    "stops": 0,
+    "elapsed": 47.7,
+    "min_clearance": 0.2625299831375571
+  },
+  {
+    "seed": 202,
+    "method": "risk",
+    "success": true,
+    "collisions": 0,
+    "near_misses": 0,
+    "distance": 33.200544633972235,
+    "replans": 3,
+    "stops": 0,
+    "elapsed": 53.900000000000006,
+    "min_clearance": 0.32427069931085456
+  }
+]
