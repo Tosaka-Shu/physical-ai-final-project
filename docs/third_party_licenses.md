@@ -1,6 +1,6 @@
 # 使用OSSとライセンス
 
-今回のインストール済み配布メタデータと固定依存一覧を照合した記録。ライセンスの正式本文・同梱コンポーネントの権利は各配布物のLICENSE/COPYINGを参照する。ここでは依存を利用し、そのソースやバイナリを本リポジトリへ再配布していない。
+依存バージョンはrequirements-lock.txtで固定する。ライセンスの正式本文と同梱コンポーネントの条件は各配布物のLICENSE/COPYINGを参照する。
 
 |ライブラリ|バージョン|ライセンス|配布元|
 |---|---|---|---|
@@ -26,7 +26,7 @@
 |threadpoolctl|3.7.0|BSD-3-Clause|https://pypi.org/project/threadpoolctl/3.7.0/|
 |tzdata|2026.5|Apache-2.0 (code); data public domain|https://pypi.org/project/tzdata/2026.5/|
 
-その他の実行依存：Python 3.12.14（PSF-2.0）、FFmpeg 7.1.5（今回のビルドは--enable-gpl、GPL有効）、libx264（GPL-2.0-or-later）、Noto Sans CJK（SIL OFL-1.1）。
+その他の実行依存：Python 3.12.14（PSF-2.0）、FFmpeg 7.1.5（使用ビルドは--enable-gpl、GPL有効）、libx264（GPL-2.0-or-later）、Noto Sans CJK（SIL OFL-1.1）。
 FFmpegの適用ライセンスはビルド構成に依存するため、再配布する場合は `ffmpeg -L` と依存コーデックの条件を確認する。NumPy/SciPy等のwheelにはBLAS等の追加ライセンスが同梱される場合がある。
-フォント・ライブラリ本体・講義の非公開資料・添付PDFはGitへコピーしない。原著作物のライセンス通知は各インストール済み配布物に保持される。
+ライセンス通知は各インストール済み配布物に保持される。
 地図・描画・学習データ生成・ロボット制御・レポート本文は本プロジェクトの独自実装。サンプルや講義図表の転載はない。
