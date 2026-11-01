@@ -1,0 +1,9 @@
+{
+  "episodes": 600,
+  "target_difference": 0.05,
+  "assumed_discordance": 0.15,
+  "family_comparisons": 2,
+  "conservative_bonferroni_critical_value": 2.241402727604947,
+  "approximate_power": 0.828323608592687,
+  "note": "planning normal approximation; not a guarantee for true unknown effect or discordance"
+}
