@@ -1,0 +1,36 @@
+{
+  "parts": [
+    {
+      "source": "assets/opening.mp4",
+      "duration_s": 3.036367,
+      "source_audio": false,
+      "audio_policy": "silence"
+    },
+    {
+      "source": "outputs/final/content.mp4",
+      "duration_s": 83.021333,
+      "source_audio": true,
+      "audio_policy": "retain"
+    },
+    {
+      "source": "assets/ending.mp4",
+      "duration_s": 2.969633,
+      "source_audio": false,
+      "audio_policy": "silence"
+    }
+  ],
+  "final_duration_s": 89.059333,
+  "decode": "passed",
+  "streams": [
+    {
+      "codec_type": "video",
+      "codec_name": "h264",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "codec_type": "audio",
+      "codec_name": "aac"
+    }
+  ]
+}

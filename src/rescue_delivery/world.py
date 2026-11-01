@@ -36,11 +36,13 @@ class GridMap:
 
 class World(GridMap):
     def __init__(self, seed=0, scenario='shortcut', difficulty='normal', varied=False):
-        if scenario not in ('basic', 'shortcut', 'dynamic', 'unreachable'):
+        if scenario not in ('basic', 'shortcut', 'dynamic', 'unreachable', 'crossing', 'clutter', 'closure'):
             raise ValueError('unknown scenario')
         if difficulty not in ('easy', 'normal', 'hard'):
             raise ValueError('unknown difficulty')
         self.seed, self.scenario, self.difficulty = seed, scenario, difficulty
+        varied = varied or scenario in ('crossing','clutter','closure')
+        template={'crossing':'basic','clutter':'basic','closure':'dynamic'}.get(scenario,scenario)
         rng = np.random.default_rng(seed)
         self.grid = np.zeros((self.height, self.width), dtype=bool)
         self.grid[[0,-1],:] = True
@@ -49,7 +51,7 @@ class World(GridMap):
         gap_y = int(rng.integers(8,12)) if varied else 10
         self.grid[1:16,wall_x] = True
         self.grid[gap_y,wall_x] = False
-        if scenario == 'basic':
+        if template == 'basic':
             self.grid[gap_y-1:gap_y+2,wall_x] = False
         else:
             self.grid[gap_y-2:gap_y,wall_x-3:wall_x+4] = True
@@ -60,17 +62,24 @@ class World(GridMap):
         self.grid[self.start[1],self.start[0]] = False
         self.grid[self.goal[1],self.goal[0]] = False
         self.movers = []
-        if scenario in ('shortcut','dynamic'):
+        if template in ('shortcut','dynamic'):
             self.movers = [Mover(float(wall_x),float(gap_y),.65,float(rng.uniform(0,6.28)),
                                  frequency=float(rng.uniform(.4,.9))),
                            Mover(19.,14.,2.,float(rng.uniform(0,6.28)))]
-        if scenario == 'dynamic':
+        if template == 'dynamic':
             self.movers = self.movers[1:]  # closure, rather than central mover, blocks the shortcut
+        if scenario == 'crossing':
+            self.movers=[Mover(6.,10.,3.,float(rng.uniform(0,6.28)),frequency=.35),
+                         Mover(18.,10.,4.,float(rng.uniform(0,6.28)),frequency=.25)]
+        if scenario == 'clutter':
+            for _ in range(28):
+                x,y=map(int,(rng.integers(4,21),rng.integers(3,18)))
+                if abs(x-wall_x)>1: self.grid[y,x]=True
         if scenario == 'unreachable':
             for dx,dy in [(1,0),(-1,0),(0,1),(0,-1)]:
                 self.grid[self.goal[1]+dy,self.goal[0]+dx] = True
         self.closure_cell = (wall_x,gap_y)
-        self.closure_time = 6. if scenario == 'dynamic' else None
+        self.closure_time = 6. if template == 'dynamic' else None
         self.closure_applied = False
         self.initial_grid = self.grid.copy()
         self.refresh()

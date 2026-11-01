@@ -1,0 +1,48 @@
+{
+  "parts": [
+    {
+      "source": "assets/opening.mp4",
+      "duration_s": 3.036367,
+      "source_audio": false,
+      "audio_policy": "silence"
+    },
+    {
+      "source": "outputs/final/content.mp4",
+      "duration_s": 83.021333,
+      "source_audio": true,
+      "audio_policy": "retain"
+    },
+    {
+      "source": "assets/ending.mp4",
+      "duration_s": 2.969633,
+      "source_audio": false,
+      "audio_policy": "silence"
+    }
+  ],
+  "final_duration_s": 89.059333,
+  "decode": "passed",
+  "streams": [
+    {
+      "codec_type": "video",
+      "codec_name": "h264",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "codec_type": "audio",
+      "codec_name": "aac"
+    }
+  ],
+  "demo_selection": "closure, seed 10000: smallest fixed final seed; no outcome selection",
+  "intro_s": 4,
+  "simulation_video_s": 75,
+  "summary_s": 4,
+  "source_sha256": {
+    "assets/opening.mp4": "42c6d8ef4939590d4db5b1b121f1d0ed2028619a5c78af4e14db23d67f853ac6",
+    "assets/ending.mp4": "c2df9219ab6ef5fd272ff204b0815f890ddfca4d450896a946312b7f201589e3"
+  },
+  "original_names": {
+    "opening": "PAI\u5fdc\u75281_\u6700\u7d42\u8ab2\u984c_OP.mp4",
+    "ending": "PAI\u5fdc\u75281_\u6700\u7d42\u8ab2\u984c_ED.mp4"
+  }
+}

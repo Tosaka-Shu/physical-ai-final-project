@@ -1,0 +1,59 @@
+"""Fixed held-out, three-method paired delivery benchmark; full validated logs."""
+import argparse,csv,gzip,json,hashlib
+from pathlib import Path
+import numpy as np
+from rescue_delivery.risk_model import load
+from rescue_delivery.simulation import run,config
+from rescue_delivery.logger import write_log
+from rescue_delivery.provenance import environment_info
+
+def summarize(rows):
+    result={}
+    for method in ['distance','heuristic','risk']:
+        rr=[r for r in rows if r['method']==method]
+        if not rr: continue
+        item={'n':len(rr),'success':sum(r['success'] for r in rr),
+              'safe_success':sum(r['success'] and r['collisions']==0 and r['near_misses']==0 for r in rr),
+              'collisions':sum(r['collisions'] for r in rr),'near_misses':sum(r['near_misses'] for r in rr)}
+        for k in ['elapsed','distance','stop_time_s','replans','min_clearance','inference_latency_ms','planning_time_ms','runtime_s']:
+            x=[r[k] for r in rr];item[k]={'mean':float(np.mean(x)),'median':float(np.median(x)),'std':float(np.std(x))}
+        item['restricted_time_180']=float(np.mean([r['elapsed'] if r['success'] else 180 for r in rr]))
+        result[method]=item
+    if 'risk' in result and 'distance' in result:
+        index={(r['scenario'],r['seed'],r['method']):r for r in rows}
+        diffs=[];safe=[]
+        for r in rows:
+            if r['method']!='risk':continue
+            b=index[r['scenario'],r['seed'],'distance']
+            diffs.append((r['elapsed'] if r['success'] else 180)-(b['elapsed'] if b['success'] else 180))
+            safe.append(int(r['success'] and r['near_misses']==0)-int(b['success'] and b['near_misses']==0))
+        seed_keys=sorted({r['seed'] for r in rows})
+        risk_rows=[r for r in rows if r['method']=='risk']
+        grouped_time=[np.mean([diffs[i] for i,r in enumerate(risk_rows) if r['seed']==seed]) for seed in seed_keys]
+        grouped_safe=[np.mean([safe[i] for i,r in enumerate(risk_rows) if r['seed']==seed]) for seed in seed_keys]
+        rng=np.random.default_rng(42);idx=rng.integers(0,len(seed_keys),(2000,len(seed_keys)))
+        result['paired']={'bootstrap_unit':'seed cluster across three scenarios','risk_minus_distance_time_mean':float(np.mean(diffs)),
+                          'time_bootstrap_95ci':np.quantile(np.asarray(grouped_time)[idx].mean(axis=1),[.025,.975]).tolist(),
+                          'safe_success_difference':float(np.mean(safe)),
+                          'safe_difference_95ci':np.quantile(np.asarray(grouped_safe)[idx].mean(axis=1),[.025,.975]).tolist()}
+    return result
+
+if __name__=='__main__':
+    spec=json.loads(Path('configs/benchmark.json').read_text())
+    p=argparse.ArgumentParser();p.add_argument('--start',type=int,default=spec['seeds_start']);p.add_argument('--count',type=int,default=spec['seeds_count'])
+    p.add_argument('--output',default='outputs/final/benchmark');p.add_argument('--model',default='models/risk.joblib')
+    a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=True)
+    model=load(a.model);cfg=config('configs/selected.json');rows=[]
+    info=environment_info(cfg,a.model);info.update({'start':a.start,'count_per_scenario':a.count,'scenarios':spec['scenarios'],
+        'timeout_s':180,'safe_definition':'success and zero collisions and zero near-miss events','selection':'all fixed episodes; no post-test tuning'})
+    (out/'environment.json').write_text(json.dumps(info,indent=2))
+    for scenario in info['scenarios']:
+        for seed in range(a.start,a.start+a.count):
+            for method in ['distance','heuristic','risk']:
+                r=run(seed,model,scenario=scenario,difficulty='hard',method=method,settings=cfg)
+                write_log(out/'logs'/f'{scenario}-{seed}-{method}.jsonl.gz',r.logs)
+                rows.append(r.metrics());print(json.dumps(rows[-1]),flush=True)
+                (out/'results.json').write_text(json.dumps(rows,indent=2))
+    with (out/'results.csv').open('w') as f:
+        w=csv.DictWriter(f,fieldnames=rows[0],lineterminator='\n');w.writeheader();w.writerows(rows)
+    (out/'summary.json').write_text(json.dumps(summarize(rows),indent=2))

@@ -15,6 +15,7 @@ class ObservedMap(GridMap):
     def __init__(self, initial_grid):
         self.grid = initial_grid.copy()
         self.tracks = []
+        self.feature_cache = {}
         self.refresh()
 
     def update(self, observation):
@@ -23,7 +24,9 @@ class ObservedMap(GridMap):
             if not self.grid[y,x]:
                 self.grid[y,x] = True
                 changed = True
-        if changed: self.refresh()
+        if changed:
+            self.refresh()
+            self.feature_cache.clear()
         self.tracks = [Track(np.array(d['position']),np.array(d['velocity']),d['radius'])
                        for d in observation['detections']]
         return changed
@@ -98,7 +101,12 @@ def features(observed, p, heading, speed, t=0.):
     p=np.asarray(p,dtype=float)
     direction=np.array([np.cos(heading),np.sin(heading)])
     lateral=np.array([-direction[1],direction[0]])
-    ranges,_=raycast(observed.grid,p,np.array([heading-np.pi/2,heading,heading+np.pi/2]),5.)
+    key=(tuple(p),float(heading))
+    static=observed.feature_cache.get(key)
+    if static is None:
+        ranges,_=raycast(observed.grid,p,np.array([heading-np.pi/2,heading,heading+np.pi/2]),5.)
+        static=(observed.static_clearance(p),float(ranges[0]+ranges[2]),float(ranges[1]))
+        if np.equal(p,np.rint(p)).all(): observed.feature_cache[key]=static
     moving=[(np.linalg.norm(track.center-p),track) for track in observed.tracks]
     if moving:
         distance,track=min(moving,key=lambda pair:pair[0])
@@ -107,8 +115,8 @@ def features(observed, p, heading, speed, t=0.):
         ahead,side=np.dot(relative,direction),abs(np.dot(relative,lateral))
     else:
         distance,closing,ahead,side=10.,0.,10.,10.
-    return [observed.static_clearance(p),float(ranges[0]+ranges[2]),distance,closing,
-            ahead,side,speed,np.cos(heading),np.sin(heading),float(ranges[1])]
+    return [static[0],static[1],distance,closing,
+            ahead,side,speed,np.cos(heading),np.sin(heading),static[2]]
 
 
 FEATURES = ['static_clearance_m','passage_width_m','observed_mover_distance_m',

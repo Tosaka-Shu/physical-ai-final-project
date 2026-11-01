@@ -5,7 +5,7 @@ from .simulation import Result
 
 def replay(path):
     rows=read_log(path); first=rows[0]; last=rows[-1]
-    result=Result(first['seed'],'risk' if first['ai_active'] else 'distance',first['scenario_id'],first['difficulty'])
+    result=Result(first['seed'],first.get('method','risk' if first['ai_active'] else 'distance'),first['scenario_id'],first['difficulty'])
     result.logs=rows; result.outcome=last['delivery_result']; result.success=result.outcome=='success'
     result.elapsed=last['simulation_time']+last['dt']
     import numpy as np

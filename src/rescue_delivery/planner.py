@@ -6,7 +6,7 @@ from .sensors import features, ObservedMap
 
 
 def probability(model, X):
-    values=np.asarray(model.predict_proba(X),dtype=float)
+    values=np.asarray(model.predict_proba(np.asarray(X)),dtype=float)
     if values.shape!=(len(X),2) or not np.isfinite(values).all() or (values<0).any() or (values>1).any():
         raise ValueError('invalid model probabilities')
     if not np.allclose(values.sum(axis=1),1.): raise ValueError('unnormalized model probabilities')
@@ -19,6 +19,8 @@ def astar(observed, start, goal, model=None, t=0., blocked=frozenset(), risk_wei
     if not np.isfinite(risk_weight) or risk_weight<0: raise ValueError('risk weight must be nonnegative')
     start,goal=tuple(map(int,start)),tuple(map(int,goal))
     if not observed.free(start) or not observed.free(goal) or goal in blocked: return []
+    floor=getattr(model,'risk_floor',0.)
+    if not np.isfinite(floor) or not 0<=floor<1: raise ValueError('invalid risk floor')
     risk={}
     if model is not None and risk_weight>0:
         cells=[(x,y) for y in range(observed.height) for x in range(observed.width) if observed.free((x,y))]
@@ -44,7 +46,9 @@ def astar(observed, start, goal, model=None, t=0., blocked=frozenset(), risk_wei
         for dx,dy in [(1,0),(-1,0),(0,1),(0,-1)]:
             nxt=current[0]+dx,current[1]+dy
             if not observed.free(nxt) or nxt in blocked: continue
-            candidate=g+1+risk_weight*risk.get((nxt,dx,dy),0.)
+            floor=getattr(model,'risk_floor',0.)
+            penalty=max(0.,risk.get((nxt,dx,dy),0.)-floor)/(1-floor)
+            candidate=g+1+risk_weight*penalty
             if candidate<cost.get(nxt,float('inf')):
                 cost[nxt],parent[nxt]=candidate,current
                 h=abs(nxt[0]-goal[0])+abs(nxt[1]-goal[1])

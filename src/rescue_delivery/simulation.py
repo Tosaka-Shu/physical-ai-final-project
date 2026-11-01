@@ -52,6 +52,8 @@ class Result:
     inference_latency_ms: float = 0.
     inference_calls: int = 0
     runtime_s: float = 0.
+    planning_time_ms: float = 0.
+    stop_time_s: float = 0.
     frames: list = field(default_factory=list,repr=False)
     initial_path: list = field(default_factory=list)
     logs: list = field(default_factory=list,repr=False)
@@ -81,7 +83,10 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
     if isinstance(max_steps,bool) or not isinstance(max_steps,int) or max_steps<1:
         raise ValueError('max_steps must be a positive integer')
     if method is None: method='risk' if model is not None else 'distance'
-    if method not in ('distance','risk'): raise ValueError('unknown method')
+    if method=='heuristic':
+        from .risk_model import HeuristicRisk
+        model=HeuristicRisk()
+    if method not in ('distance','risk','heuristic'): raise ValueError('unknown method')
     wallclock=perf_counter(); world=world or World(seed,scenario,difficulty)
     result=Result(seed,method,world.scenario,world.difficulty,config=cfg.copy())
     robot=Robot(*world.start,**{k:cfg[k] for k in ['max_speed','max_omega','max_acceleration','max_angular_acceleration']})
@@ -113,17 +118,19 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
                 progress_time=t
                 progress_anchor=robot.position.copy()
             telemetry={}
+            planning_started=perf_counter()
             try:
                 if method=='risk' and not model_ok: raise ValueError('model unavailable')
-                new=astar(observed,start,world.goal,model if method=='risk' else None,t,blocked,
+                new=astar(observed,start,world.goal,model if method!='distance' else None,t,blocked,
                           cfg['risk_weight'],telemetry)
                 if stalled and not new:
-                    new=astar(observed,start,world.goal,model if method=='risk' else None,t,
+                    new=astar(observed,start,world.goal,model if method!='distance' else None,t,
                               original_blocked,cfg['risk_weight'],telemetry)
                 path=new
             except Exception:
                 # Fail closed: never silently turn risk mode into baseline.
                 model_ok=False; path=[]
+            result.planning_time_ms+=(perf_counter()-planning_started)*1000
             latency+=telemetry.get('inference_latency_ms',0.)
             if telemetry.get('inference_samples',0): result.inference_calls+=1
             if step==0: result.initial_path=path.copy()
@@ -134,7 +141,7 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
             if no_path_since is None: no_path_since=t
         else: no_path_since=None
         desired=robot.command(path[0]) if path else (0.,0.)
-        if method=='risk' and model_ok:
+        if method!='distance' and model_ok:
             direction=math.atan2(path[0][1]-robot.y,path[0][0]-robot.x) if path else robot.theta
             try:
                 begin=perf_counter()
@@ -153,6 +160,7 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
         near_before=near
         if stop_reason and not stop_before: result.stops+=1
         stop_before=bool(stop_reason)
+        if stop_reason: result.stop_time_s+=dt
         result.distance+=float(np.linalg.norm(robot.position-np.array(pre_pose[:2])))
         result.elapsed=t+dt; result.min_clearance=min(result.min_clearance,clearance)
         result.inference_latency_ms+=latency
@@ -167,7 +175,7 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
              'scenario_id':world.scenario,'difficulty':world.difficulty,'seed':seed,
              'simulation_time':float(t),'dt':dt,'robot_pose':pre_pose,'robot_velocity':pre_velocity,
              'sensor_observations':observation,'requested_action':list(desired),'selected_action':list(action),
-             'predicted_risk':predicted,'ai_active':method=='risk','planned_path':[list(p) for p in path],
+             'predicted_risk':predicted,'method':method,'ai_active':method=='risk','planned_path':[list(p) for p in path],
              'replanning_event':{'occurred':replan,'reason':plan_reason},
              'safety_stop_event':{'occurred':bool(stop_reason),'reason':stop_reason or ''},
              'collision':bool(collision),'near_miss':bool(near),'delivery_result':result.outcome,
