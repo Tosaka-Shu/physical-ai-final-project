@@ -7,6 +7,41 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
+from matplotlib.patches import FancyBboxPatch
+
+
+def draw_system_diagram(output):
+    """Keep text inside fixed boxes and arrows strictly inside the gaps."""
+    font=FontProperties(fname='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+    labels=['距離センサー\n過去の観測差分','観測地図\n特徴計算\nキャッシュ',
+            'Random Forest\n確率校正','A*経路計画\n進捗監視','独立安全ゲート\n差動二輪運動']
+    fig=plt.figure(figsize=(10.75,1.8),dpi=200)
+    ax=fig.add_axes([0,0,1,1]);ax.set(xlim=(0,10.75),ylim=(0,1.8));ax.axis('off')
+    width,gap,left,bottom,height=1.75,.45,.10,.225,1.35
+    bounds=[]
+    for i,label in enumerate(labels):
+        x=left+i*(width+gap)
+        box=FancyBboxPatch((x,bottom),width,height,boxstyle='round,pad=0,rounding_size=0.08',
+                           linewidth=1.4,edgecolor='#087d91',facecolor='#e7f3f5')
+        ax.add_patch(box)
+        text=ax.text(x+width/2,bottom+height/2,label,ha='center',va='center',
+                     fontproperties=font,fontsize=16,linespacing=1.2,color='#172b35')
+        bounds.append((box,text))
+        if i<len(labels)-1:
+            ax.annotate('',xy=(x+width+gap-.04,bottom+height/2),
+                        xytext=(x+width+.04,bottom+height/2),
+                        arrowprops={'arrowstyle':'-|>','lw':1.4,'color':'#172b35',
+                                    'mutation_scale':12,'shrinkA':0,'shrinkB':0})
+    fig.canvas.draw()
+    renderer=fig.canvas.get_renderer()
+    for box,text in bounds:
+        outer=box.get_window_extent(renderer);inner=text.get_window_extent(renderer)
+        if not (outer.x0<inner.x0<inner.x1<outer.x1 and outer.y0<inner.y0<inner.y1<outer.y1):
+            plt.close(fig)
+            raise ValueError('system diagram label exceeds its box')
+    Path(output).parent.mkdir(parents=True,exist_ok=True)
+    fig.savefig(output,dpi=200,facecolor='white')
+    plt.close(fig)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',default='outputs/statistics');a=p.parse_args();root=Path(a.root)
@@ -19,6 +54,7 @@ if __name__=='__main__':
     if (root/'ablations.json').exists():shutil.copyfile(root/'ablations.json',out/'ablations.json')
     names=['distance','heuristic','risk'];labels=['距離優先','ルール危険度','AI危険度'];colors=['#7c8b9b','#d6a13a','#138b93']
     font=FontProperties(fname='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+    draw_system_diagram(figs/'system.png')
     charts=[('safe_success','安全配送率（%）'),('restricted_time_180','失敗を180秒とする配送時間（秒）'),('distance','終了までの距離（m）'),('stop_time_s','停止時間（秒）'),('near_misses','ニアミス件数'),('process_cpu_s','プロセスCPU時間（秒）')]
     fig,axs=plt.subplots(3,2,figsize=(10,10),layout='constrained')
     for ax,(key,title) in zip(axs.flat,charts):
