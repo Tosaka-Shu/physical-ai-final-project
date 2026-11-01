@@ -39,7 +39,7 @@ python scripts/run_demo.py --compare --difficulty hard --seconds 75 --fps 8 --ou
 
 ## 比較と動画の再現
 
-basic（静的基本）、shortcut（危険な近道）、dynamic（移動障害物＋道路封鎖）の3種類を、同じシード・初期地図・センサー・物体軌跡・安全設定で比較する。難易度は `--difficulty easy|normal|hard`。全18試行は[実測結果](docs/results.md)と[個別JSON](docs/evaluation.json)。AI方式が常に改善するとは仮定しない。
+basic（静的基本）、shortcut（危険な近道）、dynamic（移動障害物＋道路封鎖）の3種類を、同じシード・初期地図・センサー・物体軌跡・安全設定で比較する。難易度は `--difficulty easy|normal|hard`。最新のhard条件12試行は[同条件比較](docs/improvement_results.md)、normal条件の基準18試行は[実測結果](docs/results.md)と[個別JSON](docs/evaluation.json)を参照。AI方式が常に改善するとは仮定しない。
 
 ```bash
 # 保存ログから75秒の比較動画を再生
@@ -63,7 +63,7 @@ python scripts/make_video.py outputs/improvement/demo75.jsonl \
 
 動画・データ・モデル・一時ログはGit除外する。
 
-[設計・構成図](docs/design.md) / [ログ仕様](docs/log_schema.md) / [OSSライセンス](docs/third_party_licenses.md) / [日本語レポート原稿](docs/report_outline.md)。GitHub ActionsのCPUテスト定義を追加したが、リモート実行結果はローカルpytestとは別に確認する。
+[設計・構成図](docs/design.md) / [ログ仕様](docs/log_schema.md) / [OSSライセンス](docs/third_party_licenses.md) / [日本語レポート原稿](docs/report_outline.md)。GitHub ActionsでCPUテストを実行する。
 
 ## 既知の制約と提出状況
 
