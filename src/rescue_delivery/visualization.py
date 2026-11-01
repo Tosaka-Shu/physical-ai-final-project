@@ -74,7 +74,7 @@ def render(result, model, output, seconds=12, fps=10, comparison=None):
                 if frame['stop']: event+='安全停止 '
                 status={'success':'配送成功','collision':'衝突で終了','timeout':'時間切れ',
                         'unreachable':'到達不能','model_unavailable':'AI異常・停止'}.get(frame['outcome'],'配送中')
-                title='通常A*' if r.method=='distance' else 'AI危険度考慮A*'
+                title={'distance':'通常A*','heuristic':'ルール危険度A*','risk':'AI危険度考慮A*'}[r.method]
                 ax.set_title(f'{title} | {frame["t"]:.1f}秒 | {status}\n{event or "走行中"}',fontproperties=font,fontsize=11)
                 ax.set_xlim(-.5,24.5); ax.set_ylim(-.5,19.5); ax.set_aspect('equal')
                 ax.tick_params(labelsize=8)
@@ -85,7 +85,7 @@ def render(result, model, output, seconds=12, fps=10, comparison=None):
                 if text is not fig._suptitle: text.remove()
             fig.text(.5,.12,'\n'.join(footer),ha='center',fontproperties=font,fontsize=10)
             fig.text(.5,.045,'緑四角:基地 / 青星:避難所 / 紫:移動障害物 / 水色破線:計画経路\n'
-                     '赤色:初期観測・東向き・0.9m/sのAI推定値（未校正）。数値は保存ログの実測。',
+                     '赤色:初期観測・東向き・0.9m/sの局所走行リスク推定値。数値は保存ログの実測。',
                      ha='center',fontproperties=font,fontsize=9)
             writer.grab_frame()
     plt.close(fig)

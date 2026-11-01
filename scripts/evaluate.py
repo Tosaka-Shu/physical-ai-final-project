@@ -10,7 +10,7 @@ from rescue_delivery.provenance import environment_info
 
 
 def summary_markdown(rows):
-    lines=['# 比較実験の実測結果（v2）','','3シナリオの同一初期状態・同じ観測／制御設定で対比較。全試行を掲載。',
+    lines=['# 比較実験の実測結果','','3シナリオの同一初期状態・同じ観測／制御設定で対比較。全試行を掲載。',
            '移動障害物はロボットと無関係な固定時刻軌跡を走る。AI方式にも真値・未来位置は与えない。',
            '距離・到達時間は全試行の実測（失敗時は終了まで）。停止回数は連続停止区間への進入回数。',
            '平均±母標準偏差。推論時間と実時間はCPU負荷で変動する。','',
@@ -29,7 +29,7 @@ def summary_markdown(rows):
     if failures:
         lines += [f"- {r['scenario']}/{r['seed']}/{r['method']}: {r['outcome']}、距離{r['distance']:.2f}m、停止{r['stops']}回" for r in failures]
     else:
-        lines += ['今回の配送評価で失敗はなかった。別途、到達不能・タイムアウト・モデル異常をテストし、安全側終了を検証した。']
+        lines += ['配送評価の全試行に成功した。別途、到達不能・タイムアウト・モデル異常をテストし、安全側終了を検証した。']
     lines+=['','AIの危険度は局所直進の合成ラベルに対する未校正の推定値である。',
             '危険な近道を避けても、共通安全層と動的な再計画が通常方式を救済するため、成功率の改善につながるとは限らない。',
             '長い迂回やモデル推論の計算負荷もコストになる。少数の固定壁構造による結果から一般的優位性は主張しない。',
@@ -38,11 +38,11 @@ def summary_markdown(rows):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(); p.add_argument('--model',default='models/risk-v2.joblib')
+    p=argparse.ArgumentParser(); p.add_argument('--model',default='models/risk.joblib')
     p.add_argument('--seeds',type=int,nargs='+',default=[200,201,202])
     p.add_argument('--scenarios',nargs='+',choices=['basic','shortcut','dynamic','crossing','clutter','closure'],default=['basic','shortcut','dynamic','crossing','clutter','closure'])
     p.add_argument('--difficulty',choices=['easy','normal','hard'],default='normal')
-    p.add_argument('--config',default=None); p.add_argument('--output',default='outputs/evaluation-v2-final')
+    p.add_argument('--config',default='configs/selected.json'); p.add_argument('--output',default='outputs/regression')
     a=p.parse_args(); model=load(a.model); rows=[]
     out=Path(a.output); out.mkdir(parents=True,exist_ok=True)
     settings=config(a.config)

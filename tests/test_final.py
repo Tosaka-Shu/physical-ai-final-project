@@ -35,3 +35,29 @@ def test_heuristic_probability_bounds():
     m=HeuristicRisk();w=World(777);known=ObservedMap(w.initial_grid)
     p=probability(m,[features(known,[3,10],0,.9)])
     assert 0<=p[0]<=1
+
+
+def test_media_concat_preserves_source_audio(tmp_path):
+    import shutil,subprocess,sys,json
+    if not shutil.which('ffmpeg'):pytest.skip('ffmpeg required')
+    sources=[]
+    for i in range(3):
+        src=tmp_path/f'{i}.mp4';sources.append(src)
+        cmd=['ffmpeg','-v','error','-y','-f','lavfi','-i','color=c=blue:s=160x90:r=30:d=0.2']
+        if i!=1:cmd+=['-f','lavfi','-i','sine=frequency=440:duration=0.2','-c:a','aac']
+        cmd+=['-c:v','libx264','-pix_fmt','yuv420p','-t','0.2',str(src)]
+        subprocess.run(cmd,check=True)
+    out=tmp_path/'complete.mp4'
+    subprocess.run([sys.executable,'scripts/compose_video.py','--opening',str(sources[0]),'--body',str(sources[1]),'--ending',str(sources[2]),'--output',str(out)],check=True)
+    report=json.loads(out.with_suffix('.json').read_text())
+    assert [p['source_audio'] for p in report['parts']]==[True,False,True]
+    assert report['decode']=='passed'
+
+
+def test_pdf_generation(tmp_path):
+    import importlib.util,subprocess,sys
+    if importlib.util.find_spec('reportlab') is None:pytest.skip('optional reportlab')
+    src=tmp_path/'report.md';src.write_text('# 自律配送\n\n## 結果\n\n実測値だけを示す。\n')
+    out=tmp_path/'report.pdf'
+    subprocess.run([sys.executable,'scripts/generate_report.py','--source',str(src),'--output',str(out)],check=True)
+    assert out.read_bytes().startswith(b'%PDF')

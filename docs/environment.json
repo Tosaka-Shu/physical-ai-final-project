@@ -1,8 +1,8 @@
 {
   "python": "3.12.14",
   "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
-  "git_commit": "9f9d52ab1cbb978490c4f99a9e2fbab96aaa316b",
-  "working_tree_dirty": true,
+  "git_commit": "41d13c5d286482999546c33b764a60065c22d5c3",
+  "working_tree_dirty": false,
   "config": {
     "dt": 0.1,
     "max_steps": 1800,
@@ -10,7 +10,7 @@
     "max_omega": 2.0,
     "max_acceleration": 1.0,
     "max_angular_acceleration": 4.0,
-    "risk_weight": 8.0,
+    "risk_weight": 2.0,
     "sensor_rays": 32,
     "sensor_range": 5.0,
     "command_timeout": 0.25,
@@ -23,6 +23,16 @@
     "pytest": "8.4.2",
     "joblib": "1.6.0"
   },
-  "model_sha256": "9dd2649bb13bec0605df27a1b276ace5b1206be45f54e2521014733e2505bb5c",
-  "ffmpeg": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers"
+  "model_sha256": "17a8f9b433228723864452f1db4a9a16c26e4046790236c113592dcb1eef26d9",
+  "ffmpeg": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "start": 10000,
+  "count_per_scenario": 30,
+  "scenarios": [
+    "crossing",
+    "clutter",
+    "closure"
+  ],
+  "timeout_s": 180,
+  "safe_definition": "success and zero collisions and zero near-miss events",
+  "selection": "all fixed episodes; no post-test tuning"
 }

@@ -8,11 +8,11 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, Image, KeepTogether
 import argparse
 parser=argparse.ArgumentParser(description="日本語説明資料PDFの生成")
 parser.add_argument('--source',default='docs/report_outline.md')
-parser.add_argument('--output',default='submission/report_preview.pdf')
+parser.add_argument('--output',default='submission/report.pdf')
 args=parser.parse_args()
 source=Path(args.source).read_text(encoding='utf-8')
 out=Path(args.output)
@@ -32,6 +32,15 @@ flow=[]; lines=source.splitlines(); i=0
 while i<len(lines):
  line=lines[i].strip()
  if not line: i+=1; continue
+ if line.startswith("!["):
+  match=re.match(r"!\[([^\]]*)\]\(([^)]+)\)",line)
+  if match:
+   image_path=Path(match[2])
+   if not image_path.is_absolute():image_path=Path(args.source).parent/image_path
+   pic=Image(str(image_path)); ratio=min(1,160*mm/pic.imageWidth,95*mm/pic.imageHeight)
+   pic.drawWidth=pic.imageWidth*ratio;pic.drawHeight=pic.imageHeight*ratio
+   flow.append(KeepTogether([pic,Paragraph(inline(match[1]),st["JPBody"])]))
+   i+=1;continue
  if line.startswith("# "):
   flow.extend([Spacer(1,22*mm),Paragraph(inline(line[2:]),st["JPTitle"]),Spacer(1,3*mm)]); i+=1; continue
  if line.startswith("## "):

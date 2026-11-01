@@ -32,3 +32,5 @@ FFmpegの適用ライセンスはビルド構成に依存するため、再配�
 地図・描画・学習データ生成・ロボット制御・レポート本文は本プロジェクトの独自実装。サンプルや講義図表の転載はない。
 
 PDF生成用の任意依存は `requirements-report.txt` に定義する。ReportLab 4.4.9はBSDライセンスで、日本語の本文をPDFへ組版する。
+
+確率校正にはscikit-learnのIsotonicRegressionを利用する。PDF用任意依存charset-normalizerはMITライセンス。assets/opening.mp4とassets/ending.mp4は提出動画用に提供された入力素材であり、ライブラリのライセンスとは別に扱う。講座提供元のロゴを保持する。

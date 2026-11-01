@@ -35,11 +35,12 @@ def summarize(rows):
     return result
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--start',type=int,default=10000);p.add_argument('--count',type=int,default=30)
+    spec=json.loads(Path('configs/benchmark.json').read_text())
+    p=argparse.ArgumentParser();p.add_argument('--start',type=int,default=spec['seeds_start']);p.add_argument('--count',type=int,default=spec['seeds_count'])
     p.add_argument('--output',default='outputs/final/benchmark');p.add_argument('--model',default='models/risk.joblib')
     a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=True)
     model=load(a.model);cfg=config('configs/selected.json');rows=[]
-    info=environment_info(cfg,a.model);info.update({'start':a.start,'count_per_scenario':a.count,'scenarios':['crossing','clutter','closure'],
+    info=environment_info(cfg,a.model);info.update({'start':a.start,'count_per_scenario':a.count,'scenarios':spec['scenarios'],
         'timeout_s':180,'safe_definition':'success and zero collisions and zero near-miss events','selection':'all fixed episodes; no post-test tuning'})
     (out/'environment.json').write_text(json.dumps(info,indent=2))
     for scenario in info['scenarios']:
@@ -50,5 +51,5 @@ if __name__=='__main__':
                 rows.append(r.metrics());print(json.dumps(rows[-1]),flush=True)
                 (out/'results.json').write_text(json.dumps(rows,indent=2))
     with (out/'results.csv').open('w') as f:
-        w=csv.DictWriter(f,fieldnames=rows[0]);w.writeheader();w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=rows[0],lineterminator='\n');w.writeheader();w.writerows(rows)
     (out/'summary.json').write_text(json.dumps(summarize(rows),indent=2))

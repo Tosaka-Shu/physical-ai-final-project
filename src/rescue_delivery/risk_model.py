@@ -21,7 +21,7 @@ def metrics_for(model,X,y):
             'batch_inference_ms':latency,'mean_inference_ms_per_sample':latency/len(y)}
 
 
-def train(output='models/risk-v2.joblib', samples=150):
+def train(output='models/base.joblib', samples=150):
     splits={'train':list(range(24)),'validation':list(range(40,46)),'test':list(range(100,106))}
     data={key:dataset(seeds,samples) for key,seeds in splits.items()}
     summaries={key:validate_dataset(*values) for key,values in data.items()}

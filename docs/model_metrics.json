@@ -132,30 +132,140 @@
         254
       ]
     ],
+    "pr_auc": 0.9709064109025559,
+    "brier_score": 0.04446755976440758,
+    "calibration_bins": [
+      {
+        "lower": 0.0,
+        "count": 449,
+        "predicted": 0.018339777790932835,
+        "observed": 0.008908685968819599
+      },
+      {
+        "lower": 0.1,
+        "count": 77,
+        "predicted": 0.15058131075327422,
+        "observed": 0.09090909090909091
+      },
+      {
+        "lower": 0.2,
+        "count": 47,
+        "predicted": 0.25033821756066593,
+        "observed": 0.14893617021276595
+      },
+      {
+        "lower": 0.30000000000000004,
+        "count": 30,
+        "predicted": 0.34211380062957153,
+        "observed": 0.1
+      },
+      {
+        "lower": 0.4,
+        "count": 22,
+        "predicted": 0.4462729448982062,
+        "observed": 0.3181818181818182
+      },
+      {
+        "lower": 0.5,
+        "count": 14,
+        "predicted": 0.5493854352220918,
+        "observed": 0.35714285714285715
+      },
+      {
+        "lower": 0.6000000000000001,
+        "count": 18,
+        "predicted": 0.653087912205257,
+        "observed": 0.6666666666666666
+      },
+      {
+        "lower": 0.7000000000000001,
+        "count": 4,
+        "predicted": 0.7579837736222067,
+        "observed": 0.5
+      },
+      {
+        "lower": 0.8,
+        "count": 49,
+        "predicted": 0.8607716869402249,
+        "observed": 0.9387755102040817
+      },
+      {
+        "lower": 0.9,
+        "count": 190,
+        "predicted": 0.9687567564869488,
+        "observed": 0.9947368421052631
+      }
+    ],
     "roc_auc": 0.9824531203378549,
     "roc_auc_unavailable_reason": null,
-    "batch_inference_ms": 13.184581000132312,
-    "mean_inference_ms_per_sample": 0.014649534444591458
+    "batch_inference_ms": 21.951125003397465,
+    "mean_inference_ms_per_sample": 0.02439013889266385
   },
   "test": {
-    "accuracy": 0.9588888888888889,
-    "precision": 0.9467213114754098,
-    "recall": 0.9058823529411765,
-    "f1": 0.9258517034068137,
+    "accuracy": 0.9577777777777777,
+    "precision": 0.9737991266375546,
+    "recall": 0.8745098039215686,
+    "f1": 0.9214876033057852,
     "confusion_matrix": [
       [
-        632,
-        13
+        639,
+        6
       ],
       [
-        24,
-        231
+        32,
+        223
       ]
     ],
-    "roc_auc": 0.9911293509651923,
+    "pr_auc": 0.9743598521409476,
+    "brier_score": 0.03132101017752774,
+    "calibration_bins": [
+      {
+        "lower": 0.0,
+        "count": 619,
+        "predicted": 0.019498920907028622,
+        "observed": 0.017770597738287562
+      },
+      {
+        "lower": 0.2,
+        "count": 40,
+        "predicted": 0.21911799216711997,
+        "observed": 0.375
+      },
+      {
+        "lower": 0.4,
+        "count": 12,
+        "predicted": 0.46666666666666673,
+        "observed": 0.5
+      },
+      {
+        "lower": 0.5,
+        "count": 5,
+        "predicted": 0.6,
+        "observed": 0.6
+      },
+      {
+        "lower": 0.6000000000000001,
+        "count": 1,
+        "predicted": 0.6666666666666666,
+        "observed": 1.0
+      },
+      {
+        "lower": 0.8,
+        "count": 14,
+        "predicted": 0.834343253709601,
+        "observed": 0.7857142857142857
+      },
+      {
+        "lower": 0.9,
+        "count": 209,
+        "predicted": 0.9891378792552277,
+        "observed": 0.9952153110047847
+      }
+    ],
+    "roc_auc": 0.9903176774585802,
     "roc_auc_unavailable_reason": null,
-    "batch_inference_ms": 11.963331000060862,
-    "mean_inference_ms_per_sample": 0.013292590000067625
+    "batch_inference_ms": 6.0461609973572195,
+    "mean_inference_ms_per_sample": 0.006717956663730244
   },
   "feature_importance": {
     "static_clearance_m": 0.4246717408968349,
@@ -185,5 +295,593 @@
     "heading_cos",
     "heading_sin",
     "map_front_range_m"
-  ]
+  ],
+  "calibration_scenarios": [
+    60,
+    61,
+    62,
+    63,
+    64,
+    65
+  ],
+  "calibration_sha256": "b7d1b116391c3aff5f853e8923c2980fdb1dac94ede03cebc507ee9a482d24bc",
+  "calibration_selection": "isotonic",
+  "calibration_validation": {
+    "raw": {
+      "accuracy": 0.9455555555555556,
+      "precision": 0.9236363636363636,
+      "recall": 0.900709219858156,
+      "f1": 0.9120287253141831,
+      "confusion_matrix": [
+        [
+          597,
+          21
+        ],
+        [
+          28,
+          254
+        ]
+      ],
+      "pr_auc": 0.9709064109025559,
+      "brier_score": 0.04446755976440758,
+      "calibration_bins": [
+        {
+          "lower": 0.0,
+          "count": 449,
+          "predicted": 0.018339777790932835,
+          "observed": 0.008908685968819599
+        },
+        {
+          "lower": 0.1,
+          "count": 77,
+          "predicted": 0.15058131075327422,
+          "observed": 0.09090909090909091
+        },
+        {
+          "lower": 0.2,
+          "count": 47,
+          "predicted": 0.25033821756066593,
+          "observed": 0.14893617021276595
+        },
+        {
+          "lower": 0.30000000000000004,
+          "count": 30,
+          "predicted": 0.34211380062957153,
+          "observed": 0.1
+        },
+        {
+          "lower": 0.4,
+          "count": 22,
+          "predicted": 0.4462729448982062,
+          "observed": 0.3181818181818182
+        },
+        {
+          "lower": 0.5,
+          "count": 14,
+          "predicted": 0.5493854352220918,
+          "observed": 0.35714285714285715
+        },
+        {
+          "lower": 0.6000000000000001,
+          "count": 18,
+          "predicted": 0.653087912205257,
+          "observed": 0.6666666666666666
+        },
+        {
+          "lower": 0.7000000000000001,
+          "count": 4,
+          "predicted": 0.7579837736222067,
+          "observed": 0.5
+        },
+        {
+          "lower": 0.8,
+          "count": 49,
+          "predicted": 0.8607716869402249,
+          "observed": 0.9387755102040817
+        },
+        {
+          "lower": 0.9,
+          "count": 190,
+          "predicted": 0.9687567564869488,
+          "observed": 0.9947368421052631
+        }
+      ],
+      "roc_auc": 0.9824531203378549,
+      "roc_auc_unavailable_reason": null,
+      "batch_inference_ms": 5.42940100422129,
+      "mean_inference_ms_per_sample": 0.0060326677824681
+    },
+    "isotonic": {
+      "accuracy": 0.9477777777777778,
+      "precision": 0.9644268774703557,
+      "recall": 0.8652482269503546,
+      "f1": 0.9121495327102803,
+      "confusion_matrix": [
+        [
+          609,
+          9
+        ],
+        [
+          38,
+          244
+        ]
+      ],
+      "pr_auc": 0.9603399565232279,
+      "brier_score": 0.04178629198346656,
+      "calibration_bins": [
+        {
+          "lower": 0.0,
+          "count": 586,
+          "predicted": 0.01962626181915785,
+          "observed": 0.032423208191126277
+        },
+        {
+          "lower": 0.1,
+          "count": 1,
+          "predicted": 0.1721860803269537,
+          "observed": 1.0
+        },
+        {
+          "lower": 0.2,
+          "count": 42,
+          "predicted": 0.21875,
+          "observed": 0.21428571428571427
+        },
+        {
+          "lower": 0.30000000000000004,
+          "count": 1,
+          "predicted": 0.39880867949207083,
+          "observed": 0.0
+        },
+        {
+          "lower": 0.4,
+          "count": 17,
+          "predicted": 0.4666666666666667,
+          "observed": 0.5294117647058824
+        },
+        {
+          "lower": 0.5,
+          "count": 6,
+          "predicted": 0.5849380102631193,
+          "observed": 0.8333333333333334
+        },
+        {
+          "lower": 0.8,
+          "count": 7,
+          "predicted": 0.8364076643815411,
+          "observed": 0.42857142857142855
+        },
+        {
+          "lower": 0.9,
+          "count": 240,
+          "predicted": 0.9919263120374976,
+          "observed": 0.9833333333333333
+        }
+      ],
+      "roc_auc": 0.9812165760058758,
+      "roc_auc_unavailable_reason": null,
+      "batch_inference_ms": 5.229459959082305,
+      "mean_inference_ms_per_sample": 0.005810511065647006
+    }
+  },
+  "delivery_validation": [
+    {
+      "weight": 1.0,
+      "floor": 0.2,
+      "score": 2369.8,
+      "rows": [
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": false,
+          "outcome": "collision",
+          "collisions": 1,
+          "near_misses": 1,
+          "distance": 18.341650418354583,
+          "replans": 10,
+          "stops": 1,
+          "elapsed": 41.300000000000004,
+          "min_clearance": -0.02173980887127408,
+          "inference_latency_ms": 820.716169604566,
+          "inference_calls": 424,
+          "runtime_s": 1.7912975670187734,
+          "planning_time_ms": 396.3786421227269,
+          "stop_time_s": 0.2
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 32.09034247049398,
+          "replans": 6,
+          "stops": 0,
+          "elapsed": 58.900000000000006,
+          "min_clearance": 0.2960939861752038,
+          "inference_latency_ms": 1081.932782602962,
+          "inference_calls": 596,
+          "runtime_s": 2.218887666997034,
+          "planning_time_ms": 287.8141800756566,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 21.781251333044477,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 31.900000000000002,
+          "min_clearance": 0.2999939997782192,
+          "inference_latency_ms": 602.874472970143,
+          "inference_calls": 320,
+          "runtime_s": 1.1963129329960793,
+          "planning_time_ms": 174.77735097054392,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 19.84715456,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 25.500000000000004,
+          "min_clearance": 0.3,
+          "inference_latency_ms": 457.5301818549633,
+          "inference_calls": 256,
+          "runtime_s": 0.9538917120080441,
+          "planning_time_ms": 173.21541794808581,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 35.658240752418884,
+          "replans": 2,
+          "stops": 0,
+          "elapsed": 57.800000000000004,
+          "min_clearance": 0.2748578869522486,
+          "inference_latency_ms": 1043.0169451865368,
+          "inference_calls": 581,
+          "runtime_s": 2.2169163819635287,
+          "planning_time_ms": 360.8093379298225,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 33.65151227774345,
+          "replans": 2,
+          "stops": 0,
+          "elapsed": 54.400000000000006,
+          "min_clearance": 0.27308149720778263,
+          "inference_latency_ms": 1019.4334699772298,
+          "inference_calls": 547,
+          "runtime_s": 2.2051219209679402,
+          "planning_time_ms": 363.5773330461234,
+          "stop_time_s": 0.0
+        }
+      ]
+    },
+    {
+      "weight": 2.0,
+      "floor": 0.4,
+      "score": 337.8,
+      "rows": [
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 33.42784660033634,
+          "replans": 11,
+          "stops": 0,
+          "elapsed": 60.6,
+          "min_clearance": 0.30001729871815036,
+          "inference_latency_ms": 1181.4408225473017,
+          "inference_calls": 618,
+          "runtime_s": 2.451882687979378,
+          "planning_time_ms": 407.7992961392738,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 48.860498517972744,
+          "replans": 20,
+          "stops": 0,
+          "elapsed": 107.5,
+          "min_clearance": 0.27842555034809385,
+          "inference_latency_ms": 2107.444501190912,
+          "inference_calls": 1096,
+          "runtime_s": 4.224055790982675,
+          "planning_time_ms": 577.4435099447146,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 21.779283854861802,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 31.900000000000002,
+          "min_clearance": 0.2998212363612371,
+          "inference_latency_ms": 582.3448030860163,
+          "inference_calls": 320,
+          "runtime_s": 1.1817339499830268,
+          "planning_time_ms": 178.44243603758514,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 19.84715456,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 25.500000000000004,
+          "min_clearance": 0.3,
+          "inference_latency_ms": 477.03893308062106,
+          "inference_calls": 256,
+          "runtime_s": 1.0016109209973365,
+          "planning_time_ms": 177.29764798423275,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 35.65798138851663,
+          "replans": 2,
+          "stops": 0,
+          "elapsed": 57.800000000000004,
+          "min_clearance": 0.2748578869522486,
+          "inference_latency_ms": 1091.6727199801244,
+          "inference_calls": 581,
+          "runtime_s": 2.2940855200286023,
+          "planning_time_ms": 372.35918402438983,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 33.67983689037624,
+          "replans": 2,
+          "stops": 0,
+          "elapsed": 54.50000000000001,
+          "min_clearance": 0.27308149720778263,
+          "inference_latency_ms": 1012.7786357770674,
+          "inference_calls": 548,
+          "runtime_s": 2.1834543980075978,
+          "planning_time_ms": 374.0092769730836,
+          "stop_time_s": 0.0
+        }
+      ]
+    },
+    {
+      "weight": 8.0,
+      "floor": 0.0,
+      "score": 3511.7,
+      "rows": [
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": false,
+          "outcome": "timeout",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 92.32676237646137,
+          "replans": 40,
+          "stops": 0,
+          "elapsed": 180.0,
+          "min_clearance": 0.5682769108344483,
+          "inference_latency_ms": 3546.8264202354476,
+          "inference_calls": 1841,
+          "runtime_s": 7.190154269977938,
+          "planning_time_ms": 1028.8681028177962,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "crossing",
+          "difficulty": "hard",
+          "success": false,
+          "outcome": "collision",
+          "collisions": 1,
+          "near_misses": 1,
+          "distance": 31.30282044275928,
+          "replans": 7,
+          "stops": 1,
+          "elapsed": 58.00000000000001,
+          "min_clearance": -0.06687330529405977,
+          "inference_latency_ms": 1092.5290122977458,
+          "inference_calls": 588,
+          "runtime_s": 2.2550420720363036,
+          "planning_time_ms": 337.26058807224035,
+          "stop_time_s": 0.2
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 21.779263879540995,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 31.900000000000002,
+          "min_clearance": 0.2999994330086874,
+          "inference_latency_ms": 584.5043049193919,
+          "inference_calls": 320,
+          "runtime_s": 1.1867850290145725,
+          "planning_time_ms": 176.80031299823895,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "clutter",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 21.80740684090251,
+          "replans": 0,
+          "stops": 0,
+          "elapsed": 32.0,
+          "min_clearance": 0.29999999990346565,
+          "inference_latency_ms": 603.108609910123,
+          "inference_calls": 321,
+          "runtime_s": 1.1925430090050213,
+          "planning_time_ms": 176.9629520131275,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 700,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 33.699812662785895,
+          "replans": 1,
+          "stops": 0,
+          "elapsed": 53.7,
+          "min_clearance": 0.2999999441124441,
+          "inference_latency_ms": 992.4990792642348,
+          "inference_calls": 539,
+          "runtime_s": 1.9887316390522756,
+          "planning_time_ms": 196.23468804638833,
+          "stop_time_s": 0.0
+        },
+        {
+          "seed": 701,
+          "method": "risk",
+          "scenario": "closure",
+          "difficulty": "hard",
+          "success": true,
+          "outcome": "success",
+          "collisions": 0,
+          "near_misses": 0,
+          "distance": 34.78390586487224,
+          "replans": 1,
+          "stops": 0,
+          "elapsed": 56.1,
+          "min_clearance": 0.29999997692006025,
+          "inference_latency_ms": 1061.4902721717954,
+          "inference_calls": 563,
+          "runtime_s": 2.0951703280443326,
+          "planning_time_ms": 194.67526098014787,
+          "stop_time_s": 0.0
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "risk_weight": 2.0,
+    "risk_floor": 0.4
+  },
+  "delivery_test_seeds": [
+    10000,
+    10001,
+    10002,
+    10003,
+    10004,
+    10005,
+    10006,
+    10007,
+    10008,
+    10009,
+    10010,
+    10011,
+    10012,
+    10013,
+    10014,
+    10015,
+    10016,
+    10017,
+    10018,
+    10019,
+    10020,
+    10021,
+    10022,
+    10023,
+    10024,
+    10025,
+    10026,
+    10027,
+    10028,
+    10029
+  ],
+  "test_note": "classification test reused for diagnostics; delivery test seeds are held out"
 }
