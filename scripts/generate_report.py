@@ -24,6 +24,7 @@ st.add(ParagraphStyle(name="JPTitle",parent=st["Title"],fontName=font,fontSize=1
 st.add(ParagraphStyle(name="JPSection",parent=st["Heading2"],fontName=font,fontSize=13,leading=19,textColor=colors.HexColor("#174a6e"),spaceBefore=5*mm,spaceAfter=2*mm,keepWithNext=True))
 st.add(ParagraphStyle(name="JPBody",parent=st["BodyText"],fontName=font,fontSize=9.5,leading=15,alignment=TA_JUSTIFY,wordWrap="CJK",spaceAfter=3*mm))
 st.add(ParagraphStyle(name="JPBullet",parent=st["BodyText"],fontName=font,fontSize=9.5,leading=15,alignment=TA_LEFT,wordWrap="CJK",leftIndent=5*mm,firstLineIndent=-3*mm,spaceAfter=1.5*mm))
+st.add(ParagraphStyle(name="JPCaption",parent=st["JPBody"],fontSize=9,leading=13,alignment=TA_CENTER,spaceBefore=2*mm,spaceAfter=4*mm))
 def inline(text):
  text=re.sub(r"\[([^\]]+)\]\([^)]+\)",r"\1",text)
  text=re.sub(r"`([^`]+)`",r"\1",text)
@@ -39,7 +40,8 @@ while i<len(lines):
    if not image_path.is_absolute():image_path=Path(args.source).parent/image_path
    pic=Image(str(image_path)); ratio=min(1,160*mm/pic.imageWidth,95*mm/pic.imageHeight)
    pic.drawWidth=pic.imageWidth*ratio;pic.drawHeight=pic.imageHeight*ratio
-   flow.append(KeepTogether([pic,Paragraph(inline(match[1]),st["JPBody"])]))
+   pic.hAlign='CENTER'
+   flow.append(KeepTogether([pic,Paragraph(inline(match[1]),st["JPCaption"])]))
    i+=1;continue
  if line.startswith("# "):
   flow.extend([Spacer(1,22*mm),Paragraph(inline(line[2:]),st["JPTitle"]),Spacer(1,3*mm)]); i+=1; continue
