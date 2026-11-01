@@ -14,4 +14,4 @@ for variant in ['selected','weight_zero','uncalibrated','floor_zero']:
             r=run(seed,model,scenario=scenario,difficulty='hard',settings=settings)
             rows.append({'variant':variant,**r.metrics()})
     print(variant,flush=True)
-Path('outputs/final/ablations.json').write_text(json.dumps(rows,indent=2))
+Path('outputs/statistics/ablations.json').write_text(json.dumps(rows,indent=2))

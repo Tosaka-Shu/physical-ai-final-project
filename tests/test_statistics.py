@@ -43,3 +43,10 @@ def test_confirmatory_plan_independent_seed_blocks():
     assert len(set.union(*blocks))==p['fixed_sample_size']==600
     assert all(not a.intersection(b) for i,a in enumerate(blocks) for b in blocks[i+1:])
     assert not set.union(*blocks).intersection(p['tuning_seeds']+p['regression_guard_seeds']+list(range(10000,10030)))
+
+
+def test_duplicate_or_missing_pair_rejected():
+    rows=sample_rows(False)
+    with pytest.raises(ValueError,match='empty'):study.statistics([])
+    with pytest.raises(ValueError,match='duplicate'):study.statistics(rows+[rows[0]])
+    with pytest.raises(ValueError,match='incomplete'):study.statistics(rows[1:])

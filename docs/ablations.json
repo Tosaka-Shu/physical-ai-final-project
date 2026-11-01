@@ -14,10 +14,10 @@
     "stops": 1,
     "elapsed": 9.0,
     "min_clearance": -0.08562355103276126,
-    "inference_latency_ms": 183.80940484348685,
+    "inference_latency_ms": 550.7604707963765,
     "inference_calls": 93,
-    "runtime_s": 0.6066279819933698,
-    "planning_time_ms": 297.8061970206909,
+    "runtime_s": 1.4592024520388804,
+    "planning_time_ms": 611.019748961553,
     "stop_time_s": 0.2
   },
   {
@@ -35,10 +35,10 @@
     "stops": 1,
     "elapsed": 15.4,
     "min_clearance": -0.03445339556727334,
-    "inference_latency_ms": 319.31314506800845,
+    "inference_latency_ms": 901.8615488894284,
     "inference_calls": 160,
-    "runtime_s": 0.8273470290005207,
-    "planning_time_ms": 299.5282879564911,
+    "runtime_s": 2.26458747201832,
+    "planning_time_ms": 702.5674070464447,
     "stop_time_s": 0.30000000000000004
   },
   {
@@ -56,10 +56,10 @@
     "stops": 0,
     "elapsed": 31.700000000000003,
     "min_clearance": 0.29997738188938,
-    "inference_latency_ms": 586.9535238598473,
+    "inference_latency_ms": 1569.9712138157338,
     "inference_calls": 318,
-    "runtime_s": 1.1863375829998404,
-    "planning_time_ms": 174.70242496347055,
+    "runtime_s": 3.208707069978118,
+    "planning_time_ms": 487.43617901345715,
     "stop_time_s": 0.0
   },
   {
@@ -77,10 +77,10 @@
     "stops": 0,
     "elapsed": 31.700000000000003,
     "min_clearance": 0.29751548756105634,
-    "inference_latency_ms": 584.9253671476617,
+    "inference_latency_ms": 1475.4225718206726,
     "inference_calls": 318,
-    "runtime_s": 1.1887125400244258,
-    "planning_time_ms": 184.38803602475673,
+    "runtime_s": 3.192320636997465,
+    "planning_time_ms": 486.0913860029541,
     "stop_time_s": 0.0
   },
   {
@@ -98,10 +98,10 @@
     "stops": 0,
     "elapsed": 63.900000000000006,
     "min_clearance": 0.2716502616766362,
-    "inference_latency_ms": 1173.9645272609778,
+    "inference_latency_ms": 3410.880836308934,
     "inference_calls": 643,
-    "runtime_s": 2.49550207197899,
-    "planning_time_ms": 383.85915994876996,
+    "runtime_s": 6.856308854999952,
+    "planning_time_ms": 1067.5967690185644,
     "stop_time_s": 0.0
   },
   {
@@ -119,10 +119,10 @@
     "stops": 0,
     "elapsed": 65.7,
     "min_clearance": 0.27401149383689577,
-    "inference_latency_ms": 1196.4471957762726,
+    "inference_latency_ms": 4955.335916834883,
     "inference_calls": 660,
-    "runtime_s": 2.503728186013177,
-    "planning_time_ms": 365.35119399195537,
+    "runtime_s": 9.971098993031774,
+    "planning_time_ms": 963.1642619497143,
     "stop_time_s": 0.0
   },
   {
@@ -140,10 +140,10 @@
     "stops": 1,
     "elapsed": 9.0,
     "min_clearance": -0.08562355103276126,
-    "inference_latency_ms": 164.96216907398775,
+    "inference_latency_ms": 412.18475869391114,
     "inference_calls": 90,
-    "runtime_s": 0.30546470696572214,
-    "planning_time_ms": 0.31983194639906287,
+    "runtime_s": 0.7864979349542409,
+    "planning_time_ms": 0.6133569986559451,
     "stop_time_s": 0.2
   },
   {
@@ -161,10 +161,10 @@
     "stops": 1,
     "elapsed": 15.4,
     "min_clearance": -0.03445339556727334,
-    "inference_latency_ms": 279.6160916914232,
+    "inference_latency_ms": 761.2176284892485,
     "inference_calls": 154,
-    "runtime_s": 0.541545981017407,
-    "planning_time_ms": 0.8857319480739534,
+    "runtime_s": 1.3687973479973152,
+    "planning_time_ms": 1.6453650314360857,
     "stop_time_s": 0.30000000000000004
   },
   {
@@ -182,10 +182,10 @@
     "stops": 0,
     "elapsed": 31.900000000000002,
     "min_clearance": 0.26592308937060344,
-    "inference_latency_ms": 574.5215078350157,
+    "inference_latency_ms": 1573.281877383124,
     "inference_calls": 319,
-    "runtime_s": 1.00175150699215,
-    "planning_time_ms": 0.14546397142112255,
+    "runtime_s": 2.5774618489667773,
+    "planning_time_ms": 0.24545699125155807,
     "stop_time_s": 0.0
   },
   {
@@ -203,10 +203,10 @@
     "stops": 0,
     "elapsed": 31.900000000000002,
     "min_clearance": 0.2725388072103769,
-    "inference_latency_ms": 577.482993947342,
+    "inference_latency_ms": 1510.940705484245,
     "inference_calls": 319,
-    "runtime_s": 0.99770805897424,
-    "planning_time_ms": 0.14959200052544475,
+    "runtime_s": 2.522962790040765,
+    "planning_time_ms": 0.27636397862806916,
     "stop_time_s": 0.0
   },
   {
@@ -224,10 +224,10 @@
     "stops": 0,
     "elapsed": 62.1,
     "min_clearance": 0.27119398406199585,
-    "inference_latency_ms": 1143.55702517787,
+    "inference_latency_ms": 2952.562927675899,
     "inference_calls": 621,
-    "runtime_s": 2.08126208698377,
-    "planning_time_ms": 0.7802469772286713,
+    "runtime_s": 5.394425934995525,
+    "planning_time_ms": 1.278044015634805,
     "stop_time_s": 0.0
   },
   {
@@ -245,10 +245,10 @@
     "stops": 0,
     "elapsed": 60.50000000000001,
     "min_clearance": 0.2703459572654456,
-    "inference_latency_ms": 1095.2445963048376,
+    "inference_latency_ms": 3066.9363425695337,
     "inference_calls": 605,
-    "runtime_s": 1.9682047039968893,
-    "planning_time_ms": 0.6910850061103702,
+    "runtime_s": 5.3572409999906085,
+    "planning_time_ms": 1.3082310324534774,
     "stop_time_s": 0.0
   },
   {
@@ -266,10 +266,10 @@
     "stops": 1,
     "elapsed": 67.2,
     "min_clearance": -0.05892886258049673,
-    "inference_latency_ms": 1246.4765480253845,
+    "inference_latency_ms": 3282.595561700873,
     "inference_calls": 686,
-    "runtime_s": 2.681833670998458,
-    "planning_time_ms": 454.19272710569203,
+    "runtime_s": 7.121135152003262,
+    "planning_time_ms": 1323.0172750772908,
     "stop_time_s": 0.30000000000000004
   },
   {
@@ -287,10 +287,10 @@
     "stops": 1,
     "elapsed": 15.4,
     "min_clearance": -0.03445339556727334,
-    "inference_latency_ms": 301.51833296986297,
+    "inference_latency_ms": 791.6810850729235,
     "inference_calls": 160,
-    "runtime_s": 0.7816302970168181,
-    "planning_time_ms": 273.10354000655934,
+    "runtime_s": 2.0861328550381586,
+    "planning_time_ms": 761.9185940129682,
     "stop_time_s": 0.30000000000000004
   },
   {
@@ -308,10 +308,10 @@
     "stops": 0,
     "elapsed": 31.700000000000003,
     "min_clearance": 0.29997738188938,
-    "inference_latency_ms": 561.0892894910648,
+    "inference_latency_ms": 1489.976139680948,
     "inference_calls": 318,
-    "runtime_s": 1.1564901809906587,
-    "planning_time_ms": 176.15753901191056,
+    "runtime_s": 3.007863429025747,
+    "planning_time_ms": 490.3730189544149,
     "stop_time_s": 0.0
   },
   {
@@ -329,10 +329,10 @@
     "stops": 0,
     "elapsed": 31.700000000000003,
     "min_clearance": 0.29751548756105634,
-    "inference_latency_ms": 599.1235214169137,
+    "inference_latency_ms": 1400.8816609857604,
     "inference_calls": 318,
-    "runtime_s": 1.2609022660180926,
-    "planning_time_ms": 208.2394160097465,
+    "runtime_s": 2.9891368550015613,
+    "planning_time_ms": 463.54272501775995,
     "stop_time_s": 0.0
   },
   {
@@ -350,10 +350,10 @@
     "stops": 0,
     "elapsed": 63.900000000000006,
     "min_clearance": 0.2716502616766362,
-    "inference_latency_ms": 1129.6173004666343,
+    "inference_latency_ms": 4485.532728314865,
     "inference_calls": 643,
-    "runtime_s": 2.4060427710064687,
-    "planning_time_ms": 382.6356219360605,
+    "runtime_s": 9.120685198984575,
+    "planning_time_ms": 1145.2272480819374,
     "stop_time_s": 0.0
   },
   {
@@ -371,10 +371,10 @@
     "stops": 0,
     "elapsed": 64.6,
     "min_clearance": 0.27401149383689577,
-    "inference_latency_ms": 1179.6360517619178,
+    "inference_latency_ms": 4824.9365264200605,
     "inference_calls": 649,
-    "runtime_s": 2.5187599019845948,
-    "planning_time_ms": 364.26791397389024,
+    "runtime_s": 10.33711081900401,
+    "planning_time_ms": 1772.2214999957941,
     "stop_time_s": 0.0
   },
   {
@@ -392,10 +392,10 @@
     "stops": 1,
     "elapsed": 29.700000000000003,
     "min_clearance": -0.011150573818104359,
-    "inference_latency_ms": 573.0669196345843,
+    "inference_latency_ms": 1515.979791933205,
     "inference_calls": 303,
-    "runtime_s": 1.3738390100188553,
-    "planning_time_ms": 333.282072970178,
+    "runtime_s": 3.3028289440553635,
+    "planning_time_ms": 749.1021779715084,
     "stop_time_s": 0.4
   },
   {
@@ -413,10 +413,10 @@
     "stops": 1,
     "elapsed": 79.8,
     "min_clearance": 0.011140691489443189,
-    "inference_latency_ms": 1541.3997045834549,
+    "inference_latency_ms": 4169.135450269096,
     "inference_calls": 809,
-    "runtime_s": 3.0762254599831067,
-    "planning_time_ms": 372.573534026742,
+    "runtime_s": 8.127003360015806,
+    "planning_time_ms": 1058.0065730027854,
     "stop_time_s": 1.2
   },
   {
@@ -434,10 +434,10 @@
     "stops": 0,
     "elapsed": 31.700000000000003,
     "min_clearance": 0.29997738188938,
-    "inference_latency_ms": 585.747315257322,
+    "inference_latency_ms": 1612.7056343248114,
     "inference_calls": 318,
-    "runtime_s": 1.1899119690060616,
-    "planning_time_ms": 179.9235079670325,
+    "runtime_s": 3.138821779983118,
+    "planning_time_ms": 501.8243379890919,
     "stop_time_s": 0.0
   },
   {
@@ -455,10 +455,10 @@
     "stops": 0,
     "elapsed": 30.6,
     "min_clearance": 0.29751548756105634,
-    "inference_latency_ms": 593.6542585259303,
+    "inference_latency_ms": 1529.9419197253883,
     "inference_calls": 307,
-    "runtime_s": 1.183798663027119,
-    "planning_time_ms": 179.8289529979229,
+    "runtime_s": 3.010119713959284,
+    "planning_time_ms": 502.3283140035346,
     "stop_time_s": 0.0
   },
   {
@@ -476,10 +476,10 @@
     "stops": 0,
     "elapsed": 60.900000000000006,
     "min_clearance": 0.3000003070751333,
-    "inference_latency_ms": 1135.8045770321041,
+    "inference_latency_ms": 2884.649948857259,
     "inference_calls": 612,
-    "runtime_s": 2.4401806510286406,
-    "planning_time_ms": 423.47213794710115,
+    "runtime_s": 6.197487452998757,
+    "planning_time_ms": 1028.9245450403541,
     "stop_time_s": 0.0
   },
   {
@@ -497,10 +497,10 @@
     "stops": 0,
     "elapsed": 61.300000000000004,
     "min_clearance": 0.29996370850121784,
-    "inference_latency_ms": 1183.9906636159867,
+    "inference_latency_ms": 3258.2641906337813,
     "inference_calls": 617,
-    "runtime_s": 2.5230151370051317,
-    "planning_time_ms": 387.8465539892204,
+    "runtime_s": 6.820031608978752,
+    "planning_time_ms": 1020.5343509442173,
     "stop_time_s": 0.0
   }
 ]

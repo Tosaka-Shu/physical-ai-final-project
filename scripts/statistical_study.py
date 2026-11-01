@@ -22,7 +22,7 @@ def execute(task):
     phase,variant,scenario,seed,method,weight,floor,root=task
     out=Path(root)/phase/'logs'/variant/f'{scenario}-{seed}-{method}'
     metric=out.with_suffix('.json')
-    if metric.exists():
+    if phase=='test' and metric.exists():
         cached=json.loads(metric.read_text())
         assert cached['weight']==weight and cached['floor']==floor and cached['method']==method
         return cached
@@ -36,6 +36,14 @@ def execute(task):
          'safe_success':r.success and r.collisions==0 and r.near_misses==0}
     metric.write_text(json.dumps(row,indent=2))
     return row
+
+
+def controller_hash():
+    h=hashlib.sha256()
+    for p in sorted(Path('src/rescue_delivery').glob('*.py')):
+        h.update(str(p).encode());h.update(p.read_bytes())
+    h.update(Path('configs/default.json').read_bytes())
+    return h.hexdigest()
 
 
 def run_tasks(tasks,workers,path):
@@ -53,6 +61,9 @@ def run_tasks(tasks,workers,path):
 
 def statistics(rows):
     methods=['distance','heuristic','risk'];summary={}
+    if not rows:raise ValueError('empty paired data')
+    if {r['method'] for r in rows}!=set(methods):raise ValueError('incomplete method set')
+    if any(r['safe_success']!=(r['success'] and r['collisions']==0 and r['near_misses']==0) for r in rows):raise ValueError('inconsistent safe delivery flag')
     for m in methods:
         rr=[r for r in rows if r['method']==m]
         summary[m]={'n':len(rr),'success':sum(r['success'] for r in rr),'safe_success':sum(r['safe_success'] for r in rr),
@@ -62,6 +73,9 @@ def statistics(rows):
         summary[m]['restricted_time_180']=float(np.mean([r['elapsed'] if r['success'] else 180 for r in rr]))
     comparisons=[]
     index={(r['scenario'],r['seed'],r['method']):r for r in rows}
+    if len(index)!=len(rows):raise ValueError('duplicate paired episode')
+    pair_sets=[{(r['scenario'],r['seed']) for r in rows if r['method']==m} for m in methods]
+    if any(keys!=pair_sets[0] for keys in pair_sets[1:]):raise ValueError('incomplete paired episodes')
     risk=[r for r in rows if r['method']=='risk']
     for m in ['distance','heuristic']:
         diffs=[];time_diffs=[];win=loss=0
@@ -89,14 +103,31 @@ def statistics(rows):
         adjusted=max(adjusted,min(1.,(len(order)-rank)*comparisons[i]['exact_mcnemar_two_sided_p']))
         comparisons[i]['holm_adjusted_p']=adjusted
         comparisons[i]['superiority_supported']=bool(adjusted<.05 and comparisons[i]['stratified_paired_95ci'][0]>0)
+    summary['by_scenario']={}
+    for scenario in sorted({r['scenario'] for r in rows}):
+        summary['by_scenario'][scenario]={}
+        for method in methods:
+            rr=[r for r in rows if r['scenario']==scenario and r['method']==method]
+            summary['by_scenario'][scenario][method]={'n':len(rr),'success':sum(r['success'] for r in rr),'safe_success':sum(r['safe_success'] for r in rr),'collisions':sum(r['collisions'] for r in rr),'near_misses':sum(r['near_misses'] for r in rr)}
     summary['comparisons']=comparisons
     summary['all_baselines_superiority_supported']=all(c['superiority_supported'] for c in comparisons)
     return summary
 
 
+def planning_power(plan):
+    n=plan['fixed_sample_size'];effect=plan['minimum_practical_difference']
+    discordance=plan['planning_assumptions']['paired_discordance'];family=len(plan['comparisons'])
+    critical=norm.ppf(1-plan['alpha_family_wise']/(2*family));mu=effect*np.sqrt(n/(discordance-effect**2))
+    return {'episodes':n,'target_difference':effect,'assumed_discordance':discordance,'family_comparisons':family,
+            'conservative_bonferroni_critical_value':float(critical),
+            'approximate_power':float(norm.cdf(mu-critical)+norm.cdf(-mu-critical)),
+            'note':'planning normal approximation; not a guarantee for true unknown effect or discordance'}
+
+
 def apply_selection(root):
     import joblib,shutil
-    root=Path(root);selected=json.loads((root/'selected.json').read_text())
+    root=Path(root);root.mkdir(parents=True,exist_ok=True);selected=json.loads(((root/'selected.json') if (root/'selected.json').exists() else Path('configs/method_policies.json')).read_text())
+    (root/'selected.json').write_text(json.dumps(selected,indent=2)+'\n')
     if not (root/'pilot_model.joblib').exists():shutil.copyfile('models/risk.joblib',root/'pilot_model.joblib')
     model=load('models/risk.joblib');model.risk_floor=selected['risk']['floor'];joblib.dump(model,'models/risk.joblib')
     Path('configs/selected.json').write_text(json.dumps({'risk_weight':selected['risk']['weight']},indent=2)+'\n')
@@ -104,6 +135,8 @@ def apply_selection(root):
     report=json.loads(Path('models/risk.json').read_text())
     report['initial_policy']=report.get('initial_policy',report['policy'])
     report['policy']={'risk_weight':selected['risk']['weight'],'risk_floor':selected['risk']['floor']}
+    report.pop('delivery_test_seeds',None)
+    report['confirmatory_delivery_test_plan']=json.loads(Path('configs/statistical_study.json').read_text())
     report['expanded_delivery_validation']={'seeds':list(range(1000,1010)),'regression_guard':[310,311],'selected':selected}
     Path('models/risk.json').write_text(json.dumps(report,indent=2)+'\n')
     print('frozen method policies:',selected,flush=True)
@@ -112,6 +145,7 @@ def apply_selection(root):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('phase',choices=['tune','test','analyze','apply']);p.add_argument('--workers',type=int,default=4);p.add_argument('--root',default='outputs/statistics');a=p.parse_args()
     root=Path(a.root);root.mkdir(exist_ok=True,parents=True)
+    (root/'planning_power.json').write_text(json.dumps(planning_power(json.loads(Path('configs/statistical_study.json').read_text())),indent=2)+'\n')
     if a.phase=='tune':
         candidates=[('risk',w,f) for w,f in [(2,.4),(.5,.2),(1,.2),(2,0),(4,.2),(4,0),(8,0)]]+ [('heuristic',w,0) for w in [.5,1,2,4,8]]
         cases=[(s,seed) for s in ['crossing','clutter','closure'] for seed in range(1000,1010)]
@@ -138,9 +172,11 @@ if __name__=='__main__':
                     policy=selected.get(m,{'weight':0,'floor':0})
                     tasks.append(('test','frozen',scenario,seed,m,policy['weight'],policy['floor'],str(root)))
         info=environment_info({'study_plan':plan,'selected':selected,'workers':a.workers},'models/risk.joblib')
+        info['controller_sha256']=controller_hash()
         if (root/'environment.json').exists():
             previous=json.loads((root/'environment.json').read_text())
-            assert previous['model_sha256']==info['model_sha256'] and previous['config']==info['config'],'cannot resume with changed study inputs'
+            assert previous['model_sha256']==info['model_sha256'] and previous['config']==info['config'] and previous.get('controller_sha256')==info['controller_sha256'],'cannot resume with changed study inputs'
+            info=previous
         (root/'environment.json').write_text(json.dumps(info,indent=2)+'\n')
         rows=run_tasks(tasks,a.workers,root/'test_results.json')
         assert len(rows)==3*3*plan['episodes_per_scenario']

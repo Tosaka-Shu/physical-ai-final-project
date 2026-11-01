@@ -155,5 +155,7 @@
       0.0,
       0.06694444444444293
     ]
-  }
+  },
+  "source_release_commit": "c276910a3d6742ff9574a60b9b5c2360fa50418b",
+  "role": "exploratory reference, not pooled with confirmatory 600"
 }
