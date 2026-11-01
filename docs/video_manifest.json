@@ -7,7 +7,7 @@
       "audio_policy": "silence"
     },
     {
-      "source": "outputs/final/content.mp4",
+      "source": "outputs/statistics/content.mp4",
       "duration_s": 83.021333,
       "source_audio": true,
       "audio_policy": "retain"
@@ -33,16 +33,16 @@
       "codec_name": "aac"
     }
   ],
-  "demo_selection": "closure, seed 10000: smallest fixed final seed; no outcome selection",
-  "intro_s": 4,
-  "simulation_video_s": 75,
-  "summary_s": 4,
-  "source_sha256": {
-    "assets/opening.mp4": "42c6d8ef4939590d4db5b1b121f1d0ed2028619a5c78af4e14db23d67f853ac6",
-    "assets/ending.mp4": "c2df9219ab6ef5fd272ff204b0815f890ddfca4d450896a946312b7f201589e3"
-  },
+  "demo_selection": "closure, seed 40000: smallest fixed final seed; no outcome selection",
   "original_names": {
     "opening": "PAI\u5fdc\u75281_\u6700\u7d42\u8ab2\u984c_OP.mp4",
     "ending": "PAI\u5fdc\u75281_\u6700\u7d42\u8ab2\u984c_ED.mp4"
+  },
+  "intro_s": 4,
+  "simulation_video_s": 71,
+  "summary_s": 8,
+  "source_sha256": {
+    "assets/opening.mp4": "42c6d8ef4939590d4db5b1b121f1d0ed2028619a5c78af4e14db23d67f853ac6",
+    "assets/ending.mp4": "c2df9219ab6ef5fd272ff204b0815f890ddfca4d450896a946312b7f201589e3"
   }
 }

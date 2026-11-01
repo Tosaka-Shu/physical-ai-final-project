@@ -1,1 +1,0 @@
-{"scenarios":["crossing","clutter","closure"],"seeds_start":10000,"seeds_count":30,"difficulty":"hard","timeout_s":180,"methods":["distance","heuristic","risk"],"demo_selection":"closure, smallest final seed (10000), regardless of outcome","tuning_seeds":[700,701],"ablation_seeds":[800,801],"final_test_no_retuning":true}

@@ -7,7 +7,7 @@
       "audio_policy": "silence"
     },
     {
-      "source": "outputs/final/content.mp4",
+      "source": "outputs/statistics/content.mp4",
       "duration_s": 83.021333,
       "source_audio": true,
       "audio_policy": "retain"

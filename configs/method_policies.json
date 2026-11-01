@@ -1,0 +1,16 @@
+{
+  "risk": {
+    "weight": 2,
+    "floor": 0.4,
+    "eligible": true,
+    "development_safe": 24,
+    "development_n": 30
+  },
+  "heuristic": {
+    "weight": 0.5,
+    "floor": 0,
+    "eligible": true,
+    "development_safe": 23,
+    "development_n": 30
+  }
+}

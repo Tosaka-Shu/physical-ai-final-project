@@ -1,7 +1,9 @@
-# 制御ログ仕様
+# 制御ログと評価指標
 
-1行は0.1秒の制御ステップ。simulation_timeは更新前時刻、robot_poseは更新前姿勢、next_poseは更新後姿勢。観測、要求指令、実行指令、推定危険度、経路、安全停止、再計画、真値による配送評価を保持する。
+1行は0.1秒の制御ステップ。simulation_timeは更新前時刻、robot_poseは更新前姿勢、next_poseは更新後姿勢。観測、要求指令、安全ゲート後の指令、局所危険度、経路、再計画、安全停止、真値評価を保持する。methodはdistance・heuristic・riskで、ai_activeはriskのみtrue。gzip形式も同じ品質検査を通す。
 
-methodはdistance・heuristic・risk。ai_activeはriskのみtrueで、ルール方式の推定値もpredicted_riskへ記録する。旧ログのmethodがない場合はai_activeから復元する。リプレイは物理を再実行せず、保存した姿勢と物体位置を使う。
+最終ログはoutputs/statistics/test/logs/frozen。指標には成功、safe_success、衝突、ニアミス、距離、終了時刻、停止時間、再計画、最小余裕、推論・計画の壁時計時間、プログラム実行壁時計時間runtime_s、プロセスCPU時間process_cpu_sを記録する。4プロセス実行のruntime_sには待ち時間が含まれ、process_cpu_sと混同しない。
 
-logger.pyは単調時刻、有限値、センサー範囲、周期、状態積分、連続性を検査する。jsonl.gzでも同じ検査を行う。最終ログはoutputs/final/benchmark/logs。評価指標CSV・JSONはdocs/benchmark_results.*に保存する。
+失敗時は衝突・到達不能・タイムアウトなどの終了までを記録する。配送時間の比較には失敗を180秒とするrestricted_time_180も使用する。主評価項目safe_successは時間内成功かつ衝突・ニアミス0。対応のある環境ごとに3方式が揃うことを確認し、欠損組・重複組を集計へ混入させない。
+
+リプレイは物理を再実行せず、保存姿勢・物体位置を使う。監査は全ログの品質検査、指標再集計、初期観測の方式間一致、ソースハッシュを確認する。主比較は正確McNemar両側検定とHolm補正、シナリオ内の対ブートストラップ95%区間。副次指標や部分群を主比較の代わりに使わない。

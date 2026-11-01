@@ -1,0 +1,48 @@
+{
+  "primary_endpoint": "success within 180s, zero collisions, zero near misses",
+  "comparisons": [
+    "risk vs distance",
+    "risk vs heuristic"
+  ],
+  "alpha_family_wise": 0.05,
+  "multiple_comparison_correction": "Holm across two exact two-sided McNemar tests",
+  "confidence_interval": "5000 stratified paired bootstrap draws, seed 426; independent scenario-specific episode seeds",
+  "claim_rule": "Holm-adjusted p < 0.05 and paired 95% interval lower bound > 0 for each claimed comparison",
+  "minimum_practical_difference": 0.05,
+  "episodes_per_scenario": 200,
+  "test_seed_starts": {
+    "crossing": 20000,
+    "clutter": 30000,
+    "closure": 40000
+  },
+  "fixed_sample_size": 600,
+  "no_optional_stopping": true,
+  "tuning_seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009
+  ],
+  "regression_guard_seeds": [
+    310,
+    311
+  ],
+  "selection_rule": "preserve six safe regression deliveries; then maximize 30 development safe deliveries, successes, minimize collisions and failure-penalized time; deterministic weight tie break",
+  "planning_assumptions": {
+    "paired_discordance": 0.15,
+    "target_effect": 0.05,
+    "approximate_power": 0.8,
+    "note": "normal approximation for paired binary difference suggests about 470 episodes before multiplicity; 600 fixed episodes are a planning budget, not a power guarantee"
+  },
+  "demo_selection": {
+    "scenario": "closure",
+    "seed": 40000,
+    "rule": "smallest final seed, irrespective of outcome"
+  }
+}

@@ -20,7 +20,10 @@ if __name__=='__main__':
     p.add_argument('--config',default='configs/selected.json'); p.add_argument('--compare',action='store_true'); a=p.parse_args()
     if a.seconds<=0 or a.fps<=0: p.error('seconds and fps must be positive')
     model=load(a.model) if a.method=='risk' else (HeuristicRisk() if a.method=='heuristic' else None)
-    cfg=config(a.config); r=run(a.seed,model,record=True,scenario=a.scenario,difficulty=a.difficulty,method=a.method,settings=cfg)
+    cfg=config(a.config)
+    if a.method=='heuristic' and a.config is not None and Path(a.config).resolve()==Path('configs/selected.json').resolve():
+        cfg['risk_weight']=json.loads(Path('configs/method_policies.json').read_text())['heuristic']['weight']
+    r=run(a.seed,model,record=True,scenario=a.scenario,difficulty=a.difficulty,method=a.method,settings=cfg)
     out=Path(a.output); out.parent.mkdir(parents=True,exist_ok=True)
     write_log(out.with_suffix('.jsonl'),r.logs)
     w=World(a.seed,a.scenario,a.difficulty); observed=ObservedMap(w.initial_grid)

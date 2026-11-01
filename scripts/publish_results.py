@@ -1,74 +1,67 @@
-"""Generate all publication figures/text directly from frozen benchmark results."""
-import json,shutil
+"""Publish the fixed confirmatory study, with explicit multiplicity and failures."""
+import argparse,json,os,shutil
 from pathlib import Path
-import numpy as np
-import os
 os.environ.setdefault('MPLCONFIGDIR','/tmp/rescue-matplotlib')
+import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 if __name__=='__main__':
-    src=Path('outputs/final/benchmark');out=Path('docs');figs=out/'figures';figs.mkdir(exist_ok=True)
-    summary=json.loads((src/'summary.json').read_text());model=json.loads(Path('models/risk.json').read_text())
-    names=['distance','heuristic','risk'];labels=['距離優先A*','ルール危険度A*','AI危険度A*']
-    font=FontProperties(fname='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
-    for source,dest in [('summary.json','benchmark_summary.json'),('results.csv','benchmark_results.csv'),('results.json','benchmark_results.json'),('environment.json','environment.json')]:shutil.copyfile(src/source,out/dest)
+    p=argparse.ArgumentParser();p.add_argument('--root',default='outputs/statistics');a=p.parse_args();root=Path(a.root)
+    s=json.loads((root/'summary.json').read_text());rows=json.loads((root/'test_results.json').read_text());model=json.loads(Path('models/risk.json').read_text())
+    plan=json.loads(Path('configs/statistical_study.json').read_text());policies=json.loads(Path('configs/method_policies.json').read_text())
+    out=Path('docs');figs=out/'figures';figs.mkdir(exist_ok=True);n=s['risk']['n'];assert len(rows)==3*n==1800
+    for src,dst in [('summary.json','benchmark_summary.json'),('test_results.json','benchmark_results.json'),('test_results.csv','benchmark_results.csv'),('environment.json','environment.json'),('tuning_results.json','policy_validation.json')]:shutil.copyfile(root/src,out/dst)
+    if (root/'planning_power.json').exists():shutil.copyfile(root/'planning_power.json',out/'planning_power.json')
     shutil.copyfile('models/risk.json',out/'model_metrics.json')
-    shutil.copyfile('outputs/final/ablations.json',out/'ablations.json')
-    if Path('outputs/final/baseline/results.json').exists():shutil.copyfile('outputs/final/baseline/results.json',out/'baseline_results.json')
-    charts=[('safe_success','安全配送成功数'),('elapsed','配送時間（終了まで・秒）'),('distance','走行距離（m）'),('stop_time_s','停止時間（秒）'),('near_misses','ニアミス合計'),('runtime_s','CPU実行時間（秒）')]
+    if (root/'ablations.json').exists():shutil.copyfile(root/'ablations.json',out/'ablations.json')
+    names=['distance','heuristic','risk'];labels=['距離優先','ルール危険度','AI危険度'];colors=['#7c8b9b','#d6a13a','#138b93']
+    font=FontProperties(fname='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+    charts=[('safe_success','安全配送率（%）'),('restricted_time_180','失敗を180秒とする配送時間（秒）'),('distance','終了までの距離（m）'),('stop_time_s','停止時間（秒）'),('near_misses','ニアミス件数'),('process_cpu_s','プロセスCPU時間（秒）')]
     fig,axs=plt.subplots(3,2,figsize=(10,10),layout='constrained')
     for ax,(key,title) in zip(axs.flat,charts):
-        vals=[summary[k][key] if not isinstance(summary[k][key],dict) else summary[k][key]['mean'] for k in names]
-        ax.bar(labels,vals,color=['#7c8b9b','#d6a13a','#138b93'])
-        ax.set_title(title,fontproperties=font);ax.set_xticks(range(3),labels,fontproperties=font)
+        vals=[s[m][key]['mean'] if isinstance(s[m][key],dict) else s[m][key] for m in names]
+        if key=='safe_success':vals=[v/n*100 for v in vals]
+        ax.bar(range(3),vals,color=colors);ax.set_xticks(range(3),labels,fontproperties=font);ax.set_title(title,fontproperties=font)
         for i,v in enumerate(vals):ax.text(i,v,f'{v:.2f}',ha='center',va='bottom')
         ax.margins(y=.2)
     fig.savefig(figs/'comparison.png',dpi=150);plt.close(fig)
-    fig,ax=plt.subplots(figsize=(7,4));
-    for name,vals in model['calibration_validation'].items():
-        bins=vals['calibration_bins'];ax.plot([b['predicted'] for b in bins],[b['observed'] for b in bins],'o-',label={'raw':'未校正','isotonic':'校正後'}[name])
+    fig,ax=plt.subplots(figsize=(8,3.5));cs=s['comparisons']
+    for i,c in enumerate(cs):
+        delta=c['difference']*100;lo,hi=np.array(c['stratified_paired_95ci'])*100
+        ax.errorbar(delta,i,xerr=[[max(0,delta-lo)],[max(0,hi-delta)]],fmt='o',capsize=5,color='#138b93')
+        ax.text(hi+.3,i,f"補正p={c['holm_adjusted_p']:.4g}",fontproperties=font,va='center')
+    ax.set_yticks([0,1],['AI − 距離優先','AI − ルール危険度'],fontproperties=font);ax.axvline(0,color='gray',ls='--');ax.set_xlabel('安全配送率差（ポイント）と対応95%区間',fontproperties=font);ax.margins(x=.4,y=.5);fig.tight_layout();fig.savefig(figs/'paired_effect.png',dpi=150);plt.close(fig)
+    fig,ax=plt.subplots(figsize=(7,4))
+    for name,values in model['calibration_validation'].items():
+        bins=values['calibration_bins'];ax.plot([b['predicted'] for b in bins],[b['observed'] for b in bins],'o-',label={'raw':'未校正','isotonic':'校正後'}[name])
     ax.plot([0,1],[0,1],'k--');ax.set_xlabel('予測危険度',fontproperties=font);ax.set_ylabel('観測された危険頻度',fontproperties=font);ax.legend(prop=font);fig.tight_layout();fig.savefig(figs/'calibration.png',dpi=150);plt.close(fig)
-    fig,ax=plt.subplots(figsize=(10,2.4));ax.axis('off')
-    boxes=['距離センサー\n過去の検出差分','観測地図\n特徴計算・キャッシュ','Random Forest\n確率校正','A*経路計画\n進捗監視','独立安全ゲート\n差動二輪運動']
-    for i,text in enumerate(boxes):
-        x=i*.205;ax.text(x+.08,.5,text,ha='center',va='center',fontproperties=font,fontsize=11,bbox={'boxstyle':'round,pad=.5','fc':'#e8f3f5','ec':'#217080'})
-        if i<4:ax.annotate('',xy=(x+.195,.5),xytext=(x+.165,.5),arrowprops={'arrowstyle':'->'})
-    ax.set_xlim(-.04,1.04);fig.savefig(figs/'system.png',dpi=150,bbox_inches='tight');plt.close(fig)
-    lines=['# 未知環境の対比較結果','','crossing・clutter・closure各30組、seed 10000–10029、hard、180秒制限。3方式×90組=270走行。安全配送は成功かつ衝突・ニアミス0。失敗例を除外しない。','','|指標|距離優先|ルール危険度|AI危険度|','|---|---:|---:|---:|']
-    for key,title in [('success','成功数 / 90'),('safe_success','安全配送数 / 90'),('collisions','衝突合計'),('near_misses','ニアミス合計'),('elapsed','終了までの平均時間s'),('distance','平均距離m'),('stop_time_s','平均停止時間s'),('replans','平均再計画'),('min_clearance','平均最小余裕m'),('inference_latency_ms','平均推論合計ms'),('planning_time_ms','平均計画合計ms'),('runtime_s','平均CPU実行時間s')]:
-        vals=[summary[n][key] if not isinstance(summary[n][key],dict) else summary[n][key]['mean'] for n in names]
+    lines=['# 固定600組の対比較結果','',f'全{n}組・3方式・{3*n}走行。各シナリオ200組、180秒制限。失敗を含む。安全配送＝時間内成功かつ衝突・ニアミス0。','','|指標|距離優先|ルール危険度|AI危険度|','|---|---:|---:|---:|']
+    for key,title in [('success','配送成功'),('safe_success','安全配送'),('collisions','衝突合計'),('near_misses','ニアミス合計'),('elapsed','終了までの平均時間s'),('restricted_time_180','失敗180秒の平均配送時間s'),('distance','平均距離m'),('stop_time_s','平均停止時間s'),('process_cpu_s','平均プロセスCPU時間s'),('runtime_s','並列実行中の平均壁時計時間s'),('replans','平均再計画')]:
+        vals=[s[m][key]['mean'] if isinstance(s[m][key],dict) else s[m][key] for m in names]
         lines.append('|'+title+'|'+'|'.join(f'{v:.3f}' for v in vals)+'|')
-    paired=summary['paired'];lines+=['',f"AI−距離優先の制限時間付き配送時間差：{paired['risk_minus_distance_time_mean']:.3f}秒、シード単位の対クラスターブートストラップ95%区間 {[round(x,3) for x in paired['time_bootstrap_95ci']]}。失敗は180秒とする。安全配送率差：{paired['safe_success_difference']*100:.2f}ポイント、95%区間 {[round(x*100,2) for x in paired['safe_difference_95ci']]}ポイント。区間は固定ベンチマーク内の標本不確実性で、別分布への保証ではない。",'', '![図1：全270走行を含む比較。時間と距離は失敗時の終了までを含む。](figures/comparison.png)','','全試行はbenchmark_results.csv / benchmark_results.json。gzip走行ログはoutputs/final/benchmark/logs。分類テストの性能と配送性能は区別する。ルール方式がAI方式を上回る場合もそのまま記載する。']
+    interpretation=[]
+    for c in cs:
+        label={'distance':'距離方式','heuristic':'ルール方式'}[c['baseline']];ci=[round(v*100,2) for v in c['stratified_paired_95ci']]
+        statement=(f"AI対{label}：安全配送率差 {c['difference']*100:.2f}ポイント、95%区間 {ci}。AIだけ安全配送 {c['ai_wins']}組、相手だけ安全配送 {c['ai_losses']}組。正確McNemar両側p={c['exact_mcnemar_two_sided_p']:.6g}、Holm補正p={c['holm_adjusted_p']:.6g}。"
+                   +('事前基準で当該比較の優位性が統計的に支持された。' if c['superiority_supported'] else ('当該比較ではAI方式の安全配送率低下が統計的に示された。' if c['holm_adjusted_p']<.05 and c['stratified_paired_95ci'][1]<0 else '事前基準では当該比較の優位性を支持できなかった。同等性の証明ではない。')))
+        interpretation.append(statement)
+    lines+=['',*interpretation,'','表示した95%区間は各比較の周辺区間で同時区間ではない。区間が0を含まなくても、Holm補正pが0.05以上なら事前の優位性基準を満たさない。','','95%区間は各シナリオ内の対応を維持する5,000回のブートストラップ（乱数426）。検定の2比較へHolm補正を適用。時間などの副指標は探索的な記述評価で、主指標の代わりに結論へ使わない。','','![図1：失敗を含む全走行の比較。](figures/comparison.png)','','![図2：対応差の95%区間。](figures/paired_effect.png)']
     (out/'results.md').write_text('\n'.join(lines)+'\n')
-    table='\n'.join(lines[2:18]);test=model['test'];p=model['policy']
-    report=['# AI危険度予測による災害救援物資の自律配送ロボット','','## 1. 目的とシステム','','災害現場を模した2D環境で、救援基地から避難所へ物資を配送する。AIが推定する局所衝突リスクを経路選択へ反映し、距離優先・ルール危険度・AI危険度の3方式を公平に比較する。CPU上のPython 3.12で動作し、GPU、外部API、ROS 2は使用しない。','','![図1：観測から行動までの構成。真の未来軌跡は学習ラベルと評価だけに使用。](figures/system.png)','','## 2. ロボットと環境','','25×20セル、1セル1m、基地(2,10)、避難所(22,10)。半径0.20m、車輪間隔0.40mの差動二輪ロボットを0.1秒刻みで積分する。最大速度0.9m/s、加速度1m/s²。全周32方向・最大5mの距離センサーで観測し、移動物体の速度は過去の検出差分から求める。静的初期地図と自己位置は既知とする。','','既存のbasic・shortcut・dynamicを維持し、交差する移動物体、全域の瓦礫、未知の壁位置・通路位置と道路封鎖を含むcrossing・clutter・closureを追加する。障害物の軌跡は方式に依存せず固定する。','','## 3. 学習と確率校正','','学習24シナリオ0–23、モデル選択6シナリオ40–45、確率校正6シナリオ60–65を分離し、各150候補を用いる。候補位置から1.5秒直進する局所走行を模擬し、障害物表面まで0.38m未満となる場合を危険とする。入力は壁距離、通路幅、観測物体との距離・接近速度・前方位置・横距離、速度、方向cos/sin、前方地図距離の10成分。','','Random Forestは80木、乱数42、最小葉4、深さ8/12を検証F1で選択する。isotonic回帰は独立した校正データで学習し、検証Brier scoreで採否を決める。分類テスト100–105は過去にも評価済みの診断集合であり、新しい未知配送環境とは区別する。', '',f"診断テスト900件：ROC AUC {test['roc_auc']:.4f}、PR AUC（average precision）{test['pr_auc']:.4f}、F1 {test['f1']:.4f}、適合率 {test['precision']:.4f}、再現率 {test['recall']:.4f}、Brier score {test['brier_score']:.4f}。分類精度を配送成功確率として解釈しない。",'','![図2：検証集合の信頼度曲線。対角線は予測確率と観測頻度が一致する場合。](figures/calibration.png)','','## 4. 経路選択と自律復帰','',f"距離方式の辺コストは1。ルール方式は同じ特徴量から壁近接と動的接近を評価する。AI方式は 1 + {p['risk_weight']} × max(0, p−{p['risk_floor']}) / (1−{p['risk_floor']}) を使用する。危険確率の低い領域で過剰な迂回コストを加えない。重みと閾値は配送検証seed 700・701の6環境で固定し、最終評価後は調整しない。辺コストは1以上で、マンハッタン距離は許容的である。これは局所リスクの加算コストであり、経路全体の衝突確率ではない。",'', '観測速度による2.5秒等速予測領域を全方式で一時通行禁止とする。新しい壁や接近を検知したら再計画し、3秒間に0.15m進まなければ先頭経路を一時回避する。迂回不能なら元の条件へ戻す。静的特徴だけをキャッシュし、新しい壁を観測したら無効化する。動的特徴は再計算する。小さな推論はCPUの1スレッドで実行する。','','## 5. 独立した安全制御','','近接、次の移動区間の静的・動的障害物、古い観測・指令、非有限値、モデル異常を監視し、AIに依存せず停止する。従来の閾値は緩和しない。停止中のロボットへ物体が進入する場合は衝突を防げず、評価器は接触を検出して失敗終了する。安全停止は理想即時停止であり実機のブレーキを保証しない。','','## 6. 未知配送ベンチマーク','','crossing・clutter・closure各30組、seed 10000–10029、hard、180秒制限を事前固定した。90組のうち60組は動的環境。全3方式で同じ地図・物体・センサー・安全制御を使用する。安全配送は時間内成功かつ衝突・ニアミス0と定義する。失敗を除外した時間平均は使わず、失敗時の終了までの値と、失敗を180秒として扱う制限時間付き指標を記録する。']
-    for name,label in zip(names,labels):
-        r=summary[name];report+=['',f"{label}：配送成功 {r['success']}/90、安全配送 {r['safe_success']}/90、衝突 {r['collisions']}、ニアミス {r['near_misses']}。平均終了時間 {r['elapsed']['mean']:.2f}秒、距離 {r['distance']['mean']:.2f}m、停止時間 {r['stop_time_s']['mean']:.2f}秒、CPU実行時間 {r['runtime_s']['mean']:.3f}秒。"]
-    report+=['','![図3：同一90組における3方式比較。失敗走行を含む。](figures/comparison.png)','','## 7. 結果の解釈','',f"AI−距離優先の制限時間付き配送時間差は{paired['risk_minus_distance_time_mean']:.3f}秒、95%区間は{[round(x,3) for x in paired['time_bootstrap_95ci']]}。安全配送率差は{paired['safe_success_difference']*100:.2f}ポイント、95%区間は{[round(x*100,2) for x in paired['safe_difference_95ci']]}ポイント。", '', 'AIが距離方式を上回る項目があっても、ルール方式との比較も必要である。成功率の低下や未達目標を隠さず、図と全試行の数値で判断する。移動物体の進入による失敗は、局所直進ラベルと等速予測の限界を示す。単にAIを使うだけでは配送性能は保証されない。','','## 8. 要素別評価と制約','','独立した開発seed 800・801で、危険度重み0、未校正、低リスク域抑制なし、選択済み方式を比較する。全試行はablations.jsonに記録する。速度制御・安全層・進捗監視は全方式で共通であり、その改善をAI単独の効果とは主張しない。速度調整・再計画最適化の個別アブレーションは実施していない。','','推論実時間は測定するがシミュレーション時刻へ遅延として加えていないため、実時間制御性能は主張しない。合成データ、理想的な分類・自己位置、有限の地図分布、未モデル化の滑りや通信遅延が制約である。95%区間は固定集合内のシード単位の対クラスターブートストラップで、他環境への安全保証ではない。','','## 9. 動画と再現方法','','デモは事前規則「closureの最小最終評価seed 10000」に従って選び、結果を見て選別しない。実測走行を左右同時刻で比較し、危険度、再計画、道路封鎖、配送結果を表示する。OP・EDは提供素材を保持する。素材には音声がないため完成MP4には無音AACを付ける。再生倍率は表示のみで、制御精度を変更しない。','','学習はscripts/train_improved.py、配送評価はscripts/benchmark.py、図表・原稿はscripts/publish_results.py、動画はscripts/build_submission.py、PDFはscripts/generate_report.pyで生成する。設定、データ・モデルハッシュ、Gitコミット、依存は環境記録に保存する。','','## 10. 結論','','局所走行に基づく危険度学習、独立安全層、進捗監視を備えた配送シミュレーションを実装した。AIによる効果は、固定した未知環境で距離方式とルール方式の両方と比較して評価する。未達の指標や失敗事例も含む実測値が結論の範囲である。']
-    d,a=summary['distance'],summary['risk']
-    conclusion=(f"安全配送は距離優先{d['safe_success']}/90、ルール{summary['heuristic']['safe_success']}/90、AI{a['safe_success']}/90。"
-        f"AIの安全配送率差は{paired['safe_success_difference']*100:.2f}ポイントだが95%区間は0を含む。5ポイント改善目標は未達。"
-        f"失敗を180秒とする平均は距離方式{d['restricted_time_180']:.2f}秒、AI{a['restricted_time_180']:.2f}秒で、5%短縮目標も未達。"
-        f"ニアミスは{d['near_misses']}件から{a['near_misses']}件、停止時間は平均{d['stop_time_s']['mean']:.3f}秒から{a['stop_time_s']['mean']:.3f}秒へ減った。"
-        "これらは観測値の改善であり、一般的な優位性や安全保証を示さない。ルール方式は配送成功数と衝突数でAIを上回る。")
-    report+=['','## 11. 結論の範囲','',conclusion]
-    rows=json.loads(Path('outputs/final/ablations.json').read_text())
-    report+=['','## 12. 要素別の実測値（独立開発集合）']
-    for variant in ['selected','weight_zero','uncalibrated','floor_zero']:
-        rr=[r for r in rows if r['variant']==variant]
-        report+=['',f"{variant}：{len(rr)}走行、成功{sum(r['success'] for r in rr)}、衝突{sum(r['collisions'] for r in rr)}、ニアミス{sum(r['near_misses'] for r in rr)}、平均終了時間{np.mean([r['elapsed'] for r in rr]):.2f}秒。"]
-    report+=['','条件ごとの結果だけから単一要素の普遍的優位性を判断しない。最終配送評価はこの比較に使っていない。ルール方式の重みはAIと同じ2で、独立した最適化は実施していない。']
-    baseline=json.loads(Path('docs/baseline_comparison.json').read_text()) if Path('docs/baseline_comparison.json').exists() else None
-    if baseline:
-        b,a=baseline['before']['risk'],baseline['after']['risk']
-        report+=['','## 13. 既存環境の回帰比較','',f"変更前コミット{baseline['baseline_commit'][:7]}と同じ6走行のAI比較では、配送成功は両方6/6、ニアミスは{b['near_misses']}件から{a['near_misses']}件、平均配送時間は{b['mean_elapsed']:.2f}秒から{a['mean_elapsed']:.2f}秒、CPU実行時間は{b['mean_runtime']:.2f}秒から{a['mean_runtime']:.2f}秒となった。これは既存分布の少数回帰確認であり、未知90組の結果と混同しない。CPU時間は同時実行負荷に依存する。"]
-    scores=model['calibration_validation']
-    report+=['',f"確率校正の検証Brier score：未校正{scores['raw']['brier_score']:.4f}、校正後{scores['isotonic']['brier_score']:.4f}。校正を分類F1や配送成功率の向上と同一視しない。"]
-    audit=json.loads(Path('docs/artifact_validation.json').read_text()) if Path('docs/artifact_validation.json').exists() else {}
-    if 'initial_paths_changed_by_selected_ai' in audit:report+=['',f"選択済みAIモデルは最終90組のうち{audit['initial_paths_changed_by_selected_ai']}組で距離方式と異なる初期経路を選んだ。これはログで確認した経路への寄与であり、安全性向上を意味するものではない。"]
-    if (figs/'trajectory.png').exists():report+=['','![図4：事前指定したclosure・seed 10000の実測走行。](figures/trajectory.png)']
+    test=model['test'];risk=policies['risk'];heur=policies['heuristic'];power=json.loads(Path('docs/planning_power.json').read_text())
+    report=['# AI危険度予測による災害救援物資の自律配送ロボット','','## 1. 目的とシステム','','災害現場を模した2D環境で救援基地から避難所へ配送する。学習済み局所リスクが経路選択と配送性能へ寄与するかを、距離方式と独立調整したルール方式に対して評価する。CPU上のPython 3.12で動作し、GPU・GUI・外部APIは不要である。','','![図1：観測から行動までの構成。真の未来軌跡はラベル生成・評価専用。](figures/system.png)','','## 2. ロボット・観測・安全制御','','25×20セル、1セル1m。半径0.20m、車輪間隔0.40mの差動二輪ロボットを0.1秒刻みで積分する。最大速度0.9m/s、加速度1m/s²。32方向・最大5mの距離センサーで物体を検出し、速度は過去位置の差分から求める。初期静的地図と自己位置は既知とする。','','全方式で観測速度の2.5秒等速予測領域、同じ再計画・進捗監視と独立安全停止を共有する。3秒で0.15m進まない場合は先頭経路を一時回避し、迂回不能なら元の条件へ戻す。近接、古い指令・観測、非有限値、モデル異常では停止する。壁の余裕0.035m、移動円の余裕0.12mなどの安全閾値は緩和しない。停止中に物体が進入する衝突は防げるとは限らず、真値評価器が失敗として記録する。','','## 3. AIモデルと経路コスト','','1.5秒の局所直進で障害物表面まで0.38m未満となる場合を危険ラベルとする。入力は壁距離、通路幅、観測物体の距離・接近速度・前方位置・横距離、速度、方向cos/sin、前方地図距離の10成分。学習24シナリオ0–23、モデル選択40–45、校正60–65、各150例を分離する。RFは80木、乱数42、最小葉4、深さ8/12を検証F1で選ぶ。isotonic校正は独立した校正集合で学習し、検証Brier scoreで採否を選ぶ。','','分類テスト100–105は過去にも使用した診断集合で、未知配送テストとは区別する。',f"診断900件：ROC AUC {test['roc_auc']:.4f}、PR AUC（average precision）{test['pr_auc']:.4f}、F1 {test['f1']:.4f}、適合率 {test['precision']:.4f}、再現率 {test['recall']:.4f}、Brier score {test['brier_score']:.4f}。分類精度は配送成功確率ではない。",'','![図2：分類検証集合の信頼度曲線。](figures/calibration.png)','',f"距離方式は辺コスト1。AI方式は 1 + {risk['weight']} × max(0,p−{risk['floor']})/(1−{risk['floor']}) を使う。ルール方式は同じ観測特徴から壁近接と動的接近を計算し、独立に選んだ重み{heur['weight']}を使う。辺コストは1以上なのでマンハッタン距離は許容的である。局所リスクの加算は経路全体の衝突確率ではない。静的特徴だけをキャッシュし、新しい壁を観測したら無効化する。動的特徴は再計算する。",'', '## 4. 開発用調整と回帰確認','',f"配送検証はcrossing・clutter・closure各10シード1000–1009の30組へ拡張した。AIの重みと閾値7候補、ルール方式の重み5候補を独立に比較する。既存3環境・seed 310/311の6組で安全配送を維持することを優先し、開発集合の安全配送数、成功数、衝突数、失敗時180秒の時間で選ぶ。合計432走行を使用した。選択済みAIは開発30組中{risk['development_safe']}組、ルール方式は{heur['development_safe']}組で安全配送し、両方が回帰6組の安全配送を維持した。CPU時間は選択に使わない。",'', '従来の90組は探索的な参考結果として区別する。新しい最終テストを重みやモデルの調整に使わない。以前の少数調整に比べて合わせ込みを抑える設計だが、汎化性能の向上は最終結果で判断する。','','## 5. 統計検証の事前設計','',f"主評価項目は180秒以内の安全配送率。AI対距離方式・AI対ルール方式の2比較を事前指定し、正確McNemar両側検定へHolm補正を適用する。補正p<0.05かつ対応95%区間の下限>0の場合だけ、当該比較が統計的に支持されたとする。区間はシナリオ内の対ブートストラップ5,000回、乱数426。全方式への優位性を主張するには両比較が条件を満たす必要がある。",'', f"標本数は600組に固定した。5ポイントの効果と不一致率0.15を仮定した近似検出力は約{power['approximate_power']*100:.0f}%である。真の効果が小さければ検出力は下がり、600組でも有意差は保証されない。有意になるまで試行を追加する運用は行わない。",'', '## 6. 未使用600組の評価条件','','crossingは20000–20199、clutterは30000–30199、closureは40000–40199、各200組。シナリオ間でもシードを共有しない。動的環境400組を含む。地図・物体の位相・速度をシードで固定し、全方式へ同じ環境を適用する。方式の実行順をシードから無作為化し、4プロセスで実行した。各プロセス自身のCPU時間と、並列負荷を含む壁時計時間を区別する。失敗を除外せず、終了までの指標と失敗を180秒とする配送時間の両方を記録する。','','## 7. 結果']
+    for m,label in zip(names,labels):
+        r=s[m];report+=['',f"{label}：配送成功{r['success']}/{n}、安全配送{r['safe_success']}/{n}、衝突{r['collisions']}件、ニアミス{r['near_misses']}件。平均終了時間{r['elapsed']['mean']:.2f}秒、失敗180秒の平均配送時間{r['restricted_time_180']:.2f}秒、距離{r['distance']['mean']:.2f}m、停止時間{r['stop_time_s']['mean']:.3f}秒、プロセスCPU時間{r['process_cpu_s']['mean']:.3f}秒。"]
+    report+=['','![図3：全1,800走行の記述指標。失敗を除外しない。](figures/comparison.png)','','## 8. 対応比較と考察','',*interpretation,'','![図4：安全配送率差と対応95%区間。検定の2比較にはHolm補正を適用する。](figures/paired_effect.png)']
+    report+=['','シナリオ別の安全配送数は次のとおり。部分群は探索的な記述であり、主評価の代わりに有利な環境だけを結論へ使わない。']
+    for scenario,methods in s.get('by_scenario',{}).items():
+        report+=['',scenario+'：'+'、'.join(f"{label} {methods[m]['safe_success']}/{methods[m]['n']}" for m,label in zip(names,labels))+'。']
+    claim=('両比較で事前基準を満たした。この固定ベンチマークではAIの安全配送率の優位性が統計的に支持された。' if s['all_baselines_superiority_supported'] else '少なくとも一方の比較が事前基準を満たさず、全方式に対するAIの統計的優位性は主張しない。')
+    if all(c['difference']<0 for c in cs):claim+=' 今回はAIの安全配送率の点推定が両比較とも低く、以前90組で観察された小さな改善は新しい600組では再現されなかった。'
+    report+=['',claim,'','95%区間は比較ごとの周辺区間で、2比較同時の区間ではない。Holm補正後pが0.05以上の場合は、区間が0を含まなくても事前の判定基準では統計的な優位性を主張しない。','','探索候補は有限で、ルール方式のあらゆる改良に対する優位性を意味しない。有意差があっても、5ポイント以上という実用上の改善幅や他環境への安全性を保証するものではない。推定差、区間、衝突・失敗件数を併記して判断する。時間・距離・停止時間は副次的な記述評価であり、主指標が不利な場合に別の指標へ結論を置き換えない。','','## 9. 制約と改善余地','','局所直進ラベルは旋回や到着時刻を含む経路全体をモデル化していない。等速予測の誤差、未観測物体、停止中の物体進入による失敗が残る。自己位置と物体分類は理想的で、滑り・通信遅延・実機のブレーキは未モデル化。CPU計算時間は仮想時刻へ加算しないため、実時間制御性能は主張しない。検定は固定した3環境分布を対象とし、実災害全般への汎化を保証しない。','','静的なclutterでは全方式が安全配送できる一方、動的なcrossingとclosureでAIの点推定が低かった。局所直進の分類器には経路の到着時刻・旋回・予測不確実性が直接含まれず、異なる経路や到着時間が移動物体との遭遇を増やした可能性がある。これは結果と整合する仮説で、因果関係を分離した検証は未実施である。既存の正常6環境を維持できても、動的な未知環境への安全性は保証されない。', '', '検証集合を増やし比較対象も調整することで、公平性と考察の根拠は強まる。ただしモデルを複雑にすれば必ず性能が上がるわけではない。今後は観測誤差と経路通過時刻を含むリスク予測を、別の開発集合と未使用の最終集合で検証する。安全閾値の緩和を性能向上の手段にはしない。','','## 10. デモと再現','','デモは結果に依存しない事前規則「closureの最小最終シード40000」を使う。通常方式とAI方式を同じ実測時刻で描画し、全600組の結果カードを併記する。提供OP約3秒→説明4秒→実測比較71秒→結果8秒→提供ED約3秒、総尺約89秒。両素材には音声がないため無音AACを追加する。再生倍率は表示だけで、制御周期・精度を変えない。','','学習はtrain_model.py、追加調整と最終実験はstatistical_study.py、全ログ照合はaudit_results.py、動画はbuild_submission.py、図表・原稿はpublish_results.py、PDFはgenerate_report.pyで生成する。モデルとデータのハッシュ、設定、依存、開始コミットを記録する。全試行CSV・JSONと対応比較の結果を保存し、失敗例も再現できる。']
+    audit=json.loads(Path('docs/artifact_validation.json').read_text())
+    report+=['',f"全ログの監査では、AIは600組中{audit['initial_paths_changed_by_selected_ai']}組で距離方式と異なる初期経路を選んだ。経路への寄与は確認できるが、性能向上とは区別する。"]
+    if (figs/'trajectory.png').exists():report+=['','![図5：事前指定したclosure・seed 40000の実測走行。結果による選別を行わない。](figures/trajectory.png)']
     (out/'report_outline.md').write_text('\n'.join(report)+'\n')
-    (out/'results.md').write_text((out/'results.md').read_text()+'\n'+conclusion+'\n')

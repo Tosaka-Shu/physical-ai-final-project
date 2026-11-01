@@ -25,7 +25,7 @@
 |AIをA*コストへ統合、重み0の基準復帰|planner.py、経路変更・重み0テスト|
 |封鎖観測後の再計画、到達不能処理|simulation.py、道路封鎖・到達不能テスト|
 |ログ保存・品質検査・リプレイ|logger.py、replay.py、docs/log_schema.md|
-|90組・3方式・失敗を含む評価|scripts/benchmark.py、docs/results.md|
+|600組・3方式・失敗を含む評価|scripts/statistical_study.py、docs/results.md|
 |日本語720p動画、実測ログから再生|scripts/run_demo.py、scripts/make_video.py|
 |構成図・データフロー・ライセンス|docs/design.md、docs/third_party_licenses.md|
 
