@@ -38,3 +38,9 @@ datasets/
 # System
 .DS_Store
 Thumbs.db
+
+# Reviewed, privacy-safe submission assets
+!submission/
+submission/*
+!submission/delivery_comparison_90s.mp4
+!submission/report_preview.pdf
