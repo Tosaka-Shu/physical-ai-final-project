@@ -1,0 +1,26 @@
+{
+  "before": {
+    "trials": 12,
+    "success": 12,
+    "collisions": 0,
+    "near_misses": 0,
+    "mean_distance_m": 30.41277225027602,
+    "mean_elapsed_s": 47.550000000000004,
+    "mean_runtime_s": 7.629866146079924
+  },
+  "after": {
+    "trials": 12,
+    "success": 12,
+    "collisions": 0,
+    "near_misses": 0,
+    "mean_distance_m": 30.41277225027602,
+    "mean_elapsed_s": 47.550000000000004,
+    "mean_runtime_s": 5.719558257076035
+  },
+  "envelope_benchmark": {
+    "reference_seconds": 0.014079588500317186,
+    "vectorized_seconds": 0.00011016712989658117,
+    "same_cells": true,
+    "speedup": 127.80208137884982
+  }
+}

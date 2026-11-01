@@ -61,6 +61,19 @@ class Result:
         return {k:v for k,v in vars(self).items() if k not in ('frames','initial_path','logs','config')}
 
 
+def predicted_blocked(observed):
+    """Observed constant-velocity envelopes, vectorized over map cells."""
+    if not observed.tracks:
+        return set()
+    yy,xx=np.indices((observed.height,observed.width))
+    cells=np.stack((xx,yy),axis=-1)
+    mask=np.zeros(xx.shape,dtype=bool)
+    for track in observed.tracks:
+        centers=track.center+np.linspace(0,2.5,6)[:,None]*track.velocity
+        mask |= np.any(np.sum((cells[:,:,None,:]-centers)**2,axis=-1)<1.05**2,axis=-1)
+    return {(int(x),int(y)) for y,x in np.argwhere(mask)}
+
+
 def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
         difficulty='normal', method=None, settings=None, world=None):
     cfg=config(overrides=settings)
@@ -75,6 +88,7 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
     observed=ObservedMap(world.initial_grid)
     sensor=Lidar(int(cfg['sensor_rays']),cfg['sensor_range'])
     path=[]; last_plan=-100.; near_before=False; stop_before=False; no_path_since=None
+    progress_anchor=robot.position.copy(); progress_time=0.
     dt=cfg['dt']; model_ok=(model is not None) if method=='risk' else True
     for step in range(max_steps):
         t=step*dt
@@ -83,19 +97,29 @@ def run(seed=200, model=None, max_steps=None, record=False, scenario='shortcut',
         observation=sensor.observe(world,robot.position,robot.theta,t)
         map_changed=observed.update(observation)
         while path and np.linalg.norm(robot.position-np.array(path[0]))<.15: path.pop(0)
-        blocked={(x,y) for y in range(observed.height) for x in range(observed.width)
-                 if any(min(np.linalg.norm(np.array([x,y])-(track.center+track.velocity*tau))
-                            for tau in np.linspace(0,2.5,6))<1.05 for track in observed.tracks)}
+        blocked=predicted_blocked(observed)
         start=tuple(map(int,np.rint(robot.position))); blocked.discard(start)
         danger=any(p in blocked or not observed.free(p) for p in path[:5])
+        stalled=t-progress_time>=3. and np.linalg.norm(robot.position-progress_anchor)<.15 and bool(path)
+        if np.linalg.norm(robot.position-progress_anchor)>=.15:
+            progress_anchor=robot.position.copy(); progress_time=t
         replan=False; plan_reason=''; latency=0.; predicted=0.
-        if step==0 or (map_changed or danger or not path) and t-last_plan>=cfg['replan_interval']:
-            plan_reason='initial' if step==0 else ('observed_map_change' if map_changed else 'observed_path_blocked')
+        if step==0 or (map_changed or danger or not path or stalled) and t-last_plan>=cfg['replan_interval']:
+            plan_reason='initial' if step==0 else ('progress_recovery' if stalled else ('observed_map_change' if map_changed else 'observed_path_blocked'))
+            original_blocked=blocked.copy()
+            if stalled:
+                # Temporarily avoid the stalled approach; retain the goal and current cell.
+                blocked.update(p for p in path[:2] if p not in (start,world.goal))
+                progress_time=t
+                progress_anchor=robot.position.copy()
             telemetry={}
             try:
                 if method=='risk' and not model_ok: raise ValueError('model unavailable')
                 new=astar(observed,start,world.goal,model if method=='risk' else None,t,blocked,
                           cfg['risk_weight'],telemetry)
+                if stalled and not new:
+                    new=astar(observed,start,world.goal,model if method=='risk' else None,t,
+                              original_blocked,cfg['risk_weight'],telemetry)
                 path=new
             except Exception:
                 # Fail closed: never silently turn risk mode into baseline.
