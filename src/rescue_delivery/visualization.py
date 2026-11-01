@@ -39,9 +39,9 @@ def render(result, model, output, seconds=12, fps=10, comparison=None):
     hold=min(2.,seconds/5)
     playback_time=min(max_time,2*(seconds-hold)) if preview else max_time
     speed=playback_time/(seconds-hold)
-    # Submission videos: retain the entire run and never exceed PDF's 2x allowance.
-    if not preview and speed>2.+1e-9:
-        raise ValueError('full video would exceed 2x; increase duration (max 180s for submission)')
+    # Playback changes presentation only; retain all simulated motion.
+    if not preview and speed>4.+1e-9:
+        raise ValueError('full video would exceed 4x; increase duration (max 180s for submission)')
     if not preview and seconds>180: raise ValueError('submission video must be <=180 seconds')
     with writer.saving(fig,output,100):
         for index in range(total):

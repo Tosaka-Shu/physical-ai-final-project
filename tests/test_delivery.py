@@ -238,3 +238,23 @@ def test_invalid_config_rejected_before_simulation(override):
     from rescue_delivery.simulation import config
     with pytest.raises(ValueError): config(overrides=override)
     with pytest.raises(ValueError): run(settings=override)
+
+
+def test_progress_watchdog_replans_without_disabling_safety():
+    result=run(200,scenario='basic',method='distance',max_steps=50,
+               settings={'max_speed':.01})
+    assert any(row['replanning_event']['reason']=='progress_recovery' for row in result.logs)
+    assert result.collisions==0
+    assert not result.success
+
+
+def test_vectorized_envelope_matches_reference():
+    from types import SimpleNamespace
+    from rescue_delivery.simulation import predicted_blocked
+    observed=SimpleNamespace(width=25,height=20,tracks=[
+        SimpleNamespace(center=np.array([8.,10.]),velocity=np.array([.3,-.2])),
+        SimpleNamespace(center=np.array([17.,4.]),velocity=np.array([-.4,.1]))])
+    expected={(x,y) for y in range(20) for x in range(25)
+              if any(min(np.linalg.norm(np.array([x,y])-(track.center+track.velocity*tau))
+                         for tau in np.linspace(0,2.5,6))<1.05 for track in observed.tracks)}
+    assert predicted_blocked(observed)==expected
