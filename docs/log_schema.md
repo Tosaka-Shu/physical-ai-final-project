@@ -26,9 +26,9 @@
 
 ```bash
 export PYTHONPATH="$PWD/src"
-.venv/bin/python scripts/make_video.py outputs/v2/preview.jsonl \
-  --baseline-log outputs/v2/preview-baseline.jsonl \
-  --seconds 90 --fps 10 --output outputs/v2/replay90.mp4
+.venv/bin/python scripts/make_video.py outputs/improvement/demo75.jsonl \
+  --baseline-log outputs/improvement/demo75-baseline.jsonl \
+  --seconds 75 --fps 8 --output outputs/improvement/replay75.mp4
 ```
 
 リプレイは保存した観測・姿勢・真値表示情報を読み戻すだけで運動を再計算しない。通常のPython JSONLであり、ROS 2やrosbag2を使用したとは呼ばない。
