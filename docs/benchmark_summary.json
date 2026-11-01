@@ -144,15 +144,16 @@
     "restricted_time_180": 73.64
   },
   "paired": {
+    "bootstrap_unit": "seed cluster across three scenarios",
     "risk_minus_distance_time_mean": -2.5811111111111114,
     "time_bootstrap_95ci": [
-      -8.056249999999999,
-      2.811305555555554
+      -6.773694444444446,
+      1.4338333333333304
     ],
     "safe_success_difference": 0.03333333333333333,
     "safe_difference_95ci": [
-      -0.011111111111111112,
-      0.08888888888888889
+      0.0,
+      0.06694444444444293
     ]
   }
 }

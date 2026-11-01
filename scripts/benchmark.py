@@ -27,11 +27,15 @@ def summarize(rows):
             b=index[r['scenario'],r['seed'],'distance']
             diffs.append((r['elapsed'] if r['success'] else 180)-(b['elapsed'] if b['success'] else 180))
             safe.append(int(r['success'] and r['near_misses']==0)-int(b['success'] and b['near_misses']==0))
-        rng=np.random.default_rng(42);idx=rng.integers(0,len(diffs),(2000,len(diffs)))
-        result['paired']={'risk_minus_distance_time_mean':float(np.mean(diffs)),
-                          'time_bootstrap_95ci':np.quantile(np.asarray(diffs)[idx].mean(axis=1),[.025,.975]).tolist(),
+        seed_keys=sorted({r['seed'] for r in rows})
+        risk_rows=[r for r in rows if r['method']=='risk']
+        grouped_time=[np.mean([diffs[i] for i,r in enumerate(risk_rows) if r['seed']==seed]) for seed in seed_keys]
+        grouped_safe=[np.mean([safe[i] for i,r in enumerate(risk_rows) if r['seed']==seed]) for seed in seed_keys]
+        rng=np.random.default_rng(42);idx=rng.integers(0,len(seed_keys),(2000,len(seed_keys)))
+        result['paired']={'bootstrap_unit':'seed cluster across three scenarios','risk_minus_distance_time_mean':float(np.mean(diffs)),
+                          'time_bootstrap_95ci':np.quantile(np.asarray(grouped_time)[idx].mean(axis=1),[.025,.975]).tolist(),
                           'safe_success_difference':float(np.mean(safe)),
-                          'safe_difference_95ci':np.quantile(np.asarray(safe)[idx].mean(axis=1),[.025,.975]).tolist()}
+                          'safe_difference_95ci':np.quantile(np.asarray(grouped_safe)[idx].mean(axis=1),[.025,.975]).tolist()}
     return result
 
 if __name__=='__main__':
