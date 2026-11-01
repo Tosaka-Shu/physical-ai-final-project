@@ -1,5 +1,6 @@
 """JSONL records capture pre-state, observation, command and post-state per step."""
 import json
+import gzip
 from pathlib import Path
 import math
 
@@ -13,12 +14,12 @@ REQUIRED={'episode_id','scenario_id','seed','simulation_time','dt','robot_pose',
 def write_log(path,records):
     validate_log(records)
     Path(path).parent.mkdir(parents=True,exist_ok=True)
-    with Path(path).open('w') as f:
+    with (gzip.open(path,'wt') if str(path).endswith('.gz') else Path(path).open('w')) as f:
         for row in records: f.write(json.dumps(row,allow_nan=False)+'\n')
 
 
 def read_log(path):
-    with Path(path).open() as f: records=[json.loads(line) for line in f if line.strip()]
+    with (gzip.open(path,'rt') if str(path).endswith('.gz') else Path(path).open()) as f: records=[json.loads(line) for line in f if line.strip()]
     validate_log(records)
     return records
 

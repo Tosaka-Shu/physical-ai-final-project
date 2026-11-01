@@ -11,11 +11,11 @@ from rescue_delivery.visualization import render
 from rescue_delivery.provenance import environment_info
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(); p.add_argument('--model',default='models/risk-v2.joblib')
+    p=argparse.ArgumentParser(); p.add_argument('--model',default='models/risk.joblib')
     p.add_argument('--seed',type=int,default=200); p.add_argument('--seconds',type=float,default=12)
     p.add_argument('--fps',type=int,default=10); p.add_argument('--output',default='outputs/v2-final/preview.mp4')
-    p.add_argument('--method',choices=['risk','distance'],default='risk')
-    p.add_argument('--scenario',choices=['basic','shortcut','dynamic'],default='dynamic')
+    p.add_argument('--method',choices=['risk','distance','heuristic'],default='risk')
+    p.add_argument('--scenario',choices=['basic','shortcut','dynamic','crossing','clutter','closure'],default='dynamic')
     p.add_argument('--difficulty',choices=['easy','normal','hard'],default='normal')
     p.add_argument('--config',default=None); p.add_argument('--compare',action='store_true'); a=p.parse_args()
     if a.seconds<=0 or a.fps<=0: p.error('seconds and fps must be positive')
