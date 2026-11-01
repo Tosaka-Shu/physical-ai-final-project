@@ -76,3 +76,14 @@ python scripts/make_video.py outputs/improvement/demo75.jsonl \
 75秒比較動画と説明資料PDFは [`submission/`](submission/) にあります。OmniCampus提出用のID入りファイル名のPDFはローカルの `outputs/submission/` に保存します。
 
 75秒のhard条件デモは [submission/delivery_comparison_75s.mp4](submission/delivery_comparison_75s.mp4) にあります。進捗監視による停滞時の再計画と、移動障害物の予測領域計算を備えます。[同条件比較](docs/improvement_results.md)では基本性能の維持と計算性能を確認しています。
+
+説明資料PDFは原稿から生成できます。
+
+```bash
+python -m pip install -r requirements-report.txt
+python scripts/generate_report.py
+# 提出用の名前で出力する場合
+python scripts/generate_report.py --output outputs/submission/説明資料_PAI最終課題_ID.pdf
+```
+
+原稿は `docs/report_outline.md`、公開用PDFは `submission/report_preview.pdf` です。氏名・所属・メールアドレスや提出者IDはPDF本文・作成者欄へ出力しません。
